@@ -2,195 +2,160 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>KĪNARĪ | Eternal Flame</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KĪNARĪ | GitHub Edition</title>
     <style>
         :root { --gold: #d4af37; --fire: #ff4500; --bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { height: 100%; width: 100%; margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Header Fix for Tecno */
+        header { padding: 10px; background: #0a0a0a; border-bottom: 1px solid #333; flex-shrink: 0; }
+        #keyField { width: 100%; background: #000; border: 1px solid var(--gold); color: var(--gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
         
-        body, html { 
-            height: 100dvh; width: 100%; margin: 0; padding: 0; 
-            background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif;
-            overflow: hidden; display: flex; flex-direction: column;
-        }
+        /* The Big Flame */
+        #spirit-center { flex: 0 0 auto; padding: 20px 0; text-align: center; }
+        .flame-icon { font-size: 80px; display: inline-block; filter: drop-shadow(0 0 15px var(--fire)); animation: flicker 2s infinite ease-in-out; }
+        @keyframes flicker { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
+        .thinking { animation: intense 0.4s infinite alternate !important; }
+        @keyframes intense { from { transform: scale(1.1); } to { transform: scale(1.4); } }
 
-        /* Header: Stacked for Tecno Screen */
-        header { padding: 10px 15px; background: #0a0a0a; border-bottom: 1px solid #222; z-index: 50; }
-        #keyField { 
-            width: 100%; background: #000; border: 1px solid #333; color: var(--gold); 
-            padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px;
-        }
-        .nav-row { display: flex; gap: 8px; }
-        .nav-btn { 
-            flex: 1; background: #1a1a1a; border: 1px solid #444; color: var(--gold); 
-            padding: 10px; border-radius: 6px; font-size: 12px; font-weight: bold;
-        }
-
-        /* The Large Flame */
-        #spirit-center { flex: 0 0 auto; padding: 20px 0; text-align: center; position: relative; }
-        .flame-icon { 
-            font-size: 80px; 
-            display: inline-block; 
-            filter: drop-shadow(0 0 10px var(--fire));
-            transition: 0.3s;
-            animation: flicker 2s infinite ease-in-out;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { transform: scale(1) rotate(-1deg); opacity: 0.9; }
-            50% { transform: scale(1.1) rotate(1deg); opacity: 1; filter: drop-shadow(0 0 20px #ff8c00); }
-        }
-
-        /* Thinking State */
-        .thinking { animation: intense-burn 0.5s infinite alternate !important; }
-        @keyframes intense-burn { from { transform: scale(1.1); } to { transform: scale(1.3); } }
-
-        /* Listening State */
-        .listening { filter: drop-shadow(0 0 30px #fff) !important; transform: scale(1.2); }
-
-        /* Chat History */
-        #shrine-history { 
-            flex: 1; overflow-y: auto; padding: 10px 15px; 
-            display: flex; flex-direction: column; gap: 12px; 
-        }
-        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.4; }
-        .kinari { align-self: flex-start; background: #111; border-left: 3px solid var(--gold); }
+        /* Chat Display */
+        #shrine-history { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #111; }
+        .bubble { max-width: 85%; padding: 12px; border-radius: 15px; font-size: 16px; line-height: 1.4; }
+        .kinari { align-self: flex-start; background: #111; border-left: 4px solid var(--gold); color: #fff; }
         .visitor { align-self: flex-end; background: var(--gold); color: #000; font-weight: bold; }
 
-        /* Input Bar: Positioned above Phone Nav */
-        #input-dock { 
-            background: #000; border-top: 1px solid #222; 
-            padding: 10px 15px calc(env(safe-area-inset-bottom) + 15px);
-            display: flex; gap: 10px; align-items: center;
-        }
-        #userInput { flex: 1; background: #151515; border: 1px solid #333; color: #fff; padding: 14px; border-radius: 25px; font-size: 16px; outline: none; }
-        .dock-btn { width: 50px; height: 50px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-        .mic-btn { background: #1a1a1a; color: var(--gold); border: 1px solid #444; }
-        .send-btn { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
-
-        /* Library Overlay */
-        #library { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; padding: 50px 20px; }
-        .scroll-row { background: #111; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        /* Bottom Controls */
+        #input-dock { background: #000; border-top: 1px solid #333; padding: 15px; display: flex; gap: 10px; align-items: center; }
+        #userInput { flex: 1; background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 30px; font-size: 16px; outline: none; }
+        .btn { width: 50px; height: 50px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        #micBtn { background: #222; color: var(--gold); border: 1px solid var(--gold); }
+        #sendBtn { background: var(--gold); color: #000; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header>
-        <input type="password" id="keyField" placeholder="API Key" onchange="saveKey()">
-        <div class="nav-row">
-            <button class="nav-btn" onclick="openLib()">📜 LIBRARY</button>
-            <button class="nav-btn" onclick="newScl()">+ NEW SCROLL</button>
-        </div>
-    </header>
+<header>
+    <input type="password" id="keyField" placeholder="PASTE GROQ KEY HERE" oninput="saveKey()">
+</header>
 
-    <div id="spirit-center">
-        <div class="flame-icon" id="flame">🔥</div>
-        <div style="font-size: 10px; color: var(--gold); letter-spacing: 4px; margin-top: 5px;">KĪNARĪ</div>
-    </div>
+<div id="spirit-center">
+    <div class="flame-icon" id="flame">🔥</div>
+    <div id="status" style="font-size: 11px; color: var(--gold); margin-top: 8px; letter-spacing: 2px;">KĪNARĪ</div>
+</div>
 
-    <div id="shrine-history"></div>
+<div id="shrine-history"></div>
 
-    <div id="input-dock">
-        <button class="dock-btn mic-btn" id="micBtn" onclick="talk()">🎙️</button>
-        <input type="text" id="userInput" placeholder="Speak to the Flame...">
-        <button class="dock-btn send-btn" onclick="ignite()">🔥</button>
-    </div>
+<div id="input-dock">
+    <button class="btn" id="micBtn" onclick="startListening()">🎙️</button>
+    <input type="text" id="userInput" placeholder="Whisper to the fire...">
+    <button class="btn" id="sendBtn" onclick="ignite()">🔥</button>
+</div>
 
-    <div id="library">
-        <h2 style="color:var(--gold)">Ancestral Scrolls</h2>
-        <div id="lib-list"></div>
-        <button onclick="closeLib()" style="width:100%; padding:15px; background:var(--gold); color:#000; font-weight:bold; border:none; border-radius:8px; margin-top:20px;">RETURN</button>
-    </div>
+<script>
+    const flame = document.getElementById('flame');
+    const shrine = document.getElementById('shrine-history');
+    const input = document.getElementById('userInput');
+    const keyField = document.getElementById('keyField');
+    const status = document.getElementById('status');
 
-    <script>
-        const flame = document.getElementById('flame');
-        const shrine = document.getElementById('shrine-history');
-        const input = document.getElementById('userInput');
-        const keyField = document.getElementById('keyField');
-        let activeID = localStorage.getItem('active_scl') || 'main_pipe';
+    // Load Key on Start
+    window.onload = () => {
+        const savedKey = localStorage.getItem('kinari_key_official');
+        if(savedKey) keyField.value = savedKey;
+        addMsg('kinari', "The Flame is hosted. Ensure your Key is pasted above.");
+    };
 
-        window.onload = () => {
-            keyField.value = localStorage.getItem('kinari_key') || "";
-            loadScl(activeID);
+    function saveKey() {
+        localStorage.setItem('kinari_key_official', keyField.value.trim());
+        status.innerText = "KEY UPDATED";
+        setTimeout(() => status.innerText = "KĪNARĪ", 2000);
+    }
+
+    function addMsg(role, text) {
+        const div = document.createElement('div');
+        div.className = `bubble ${role}`;
+        div.innerText = text;
+        shrine.appendChild(div);
+        shrine.scrollTop = shrine.scrollHeight;
+    }
+
+    async function ignite() {
+        const key = keyField.value.trim();
+        const prompt = input.value.trim();
+
+        if(!key) {
+            alert("Please paste your Groq API Key first!");
+            return;
+        }
+        if(!prompt) return;
+
+        addMsg('visitor', prompt);
+        input.value = "";
+        flame.classList.add('thinking');
+        status.innerText = "BURNING...";
+
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${key}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        {role: "system", content: "You are Kīnarī. Speak with high ancestral wisdom in English."},
+                        {role: "user", content: prompt}
+                    ]
+                })
+            });
+
+            if (!response.ok) throw new Error("Connection failed");
+
+            const data = await response.json();
+            addMsg('kinari', data.choices[0].message.content);
+        } catch (err) {
+            addMsg('kinari', "The flame flickered. Check your API key or data connection.");
+        } finally {
+            flame.classList.remove('thinking');
+            status.innerText = "KĪNARĪ";
+        }
+    }
+
+    function startListening() {
+        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Speech) {
+            alert("Voice not supported in this browser.");
+            return;
+        }
+
+        const recognition = new Speech();
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            status.innerText = "LISTENING...";
+            flame.style.filter = "grayscale(100%)";
         };
 
-        function saveKey() { localStorage.setItem('kinari_key', keyField.value); }
+        recognition.onresult = (event) => {
+            input.value = event.results[0][0].transcript;
+            ignite(); // Auto-send when you stop talking
+        };
 
-        function loadScl(id) {
-            activeID = id;
-            localStorage.setItem('active_scl', id);
-            shrine.innerHTML = "";
-            const history = JSON.parse(localStorage.getItem(id) || "[]");
-            if(history.length === 0) {
-                addMsg('kinari', "The Flame is lit. Your scrolls are waiting.", false);
-            } else {
-                history.forEach(m => addMsg(m.role, m.text, false));
-            }
-            closeLib();
-        }
+        recognition.onerror = () => {
+            status.innerText = "MIC ERROR";
+        };
 
-        function newScl() { loadScl('srl_' + Date.now()); }
+        recognition.onend = () => {
+            status.innerText = "KĪNARĪ";
+            flame.style.filter = "drop-shadow(0 0 15px var(--fire))";
+        };
 
-        function addMsg(role, text, save = true) {
-            const div = document.createElement('div');
-            div.className = `bubble ${role}`;
-            div.innerText = text;
-            shrine.appendChild(div);
-            if(save) {
-                const history = JSON.parse(localStorage.getItem(activeID) || "[]");
-                history.push({role, text});
-                localStorage.setItem(activeID, JSON.stringify(history));
-            }
-            shrine.scrollTop = shrine.scrollHeight;
-        }
+        recognition.start();
+    }
+</script>
 
-        async function ignite() {
-            const key = keyField.value.trim();
-            const text = input.value.trim();
-            if(!key || !text) return;
-            addMsg('visitor', text);
-            input.value = "";
-            flame.classList.add('thinking');
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: [{ role: "system", content: "You are Kīnarī. Speak in high English wisdom." }, { role: "user", content: text }]
-                    })
-                });
-                const data = await res.json();
-                addMsg('kinari', data.choices[0].message.content);
-            } catch (e) { addMsg('kinari', "The Flame flickered. Check connection."); }
-            finally { flame.classList.remove('thinking'); }
-        }
-
-        function talk() {
-            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!Speech) return alert("Mic blocked.");
-            const rec = new Speech();
-            rec.onstart = () => flame.classList.add('listening');
-            rec.onresult = (e) => { input.value = e.results[0][0].transcript; ignite(); };
-            rec.onend = () => flame.classList.remove('listening');
-            rec.start();
-        }
-
-        function openLib() {
-            document.getElementById('library').style.display = 'block';
-            const list = document.getElementById('lib-list');
-            list.innerHTML = `<div class="scroll-row"><span>Main Pipe</span><button onclick="loadScl('main_pipe')">OPEN</button></div>`;
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k.startsWith('srl_')) {
-                    const item = document.createElement('div');
-                    item.className = 'scroll-row';
-                    item.innerHTML = `<span>Scroll ${new Date(parseInt(k.split('_')[1])).toLocaleDateString()}</span><button onclick="loadScl('${k}')">OPEN</button>`;
-                    list.appendChild(item);
-                }
-            }
-        }
-        function closeLib() { document.getElementById('library').style.display = 'none'; }
-    </script>
 </body>
 </html>
