@@ -3,88 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>KĪNARĪ | Voice of the Flame</title>
+    <title>KĪNARĪ | The Great Voice</title>
     <style>
         :root { --gold: #d4af37; --fire: #ff4500; --bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
             height: 100dvh; width: 100%; margin: 0; padding: 0; 
-            background: var(--bg); color: #fff; font-family: 'serif'; 
+            background: var(--bg); color: #fff; font-family: 'Georgia', serif; 
             overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* Header - Thinner to save space */
-        header { padding: 8px 15px; background: #0a0a0a; border-bottom: 1px solid #222; z-index: 100; }
+        header { padding: 10px; background: #0a0a0a; border-bottom: 1px solid #222; z-index: 100; }
         #keyField { 
             width: 100%; background: #000; border: 1px solid #444; color: var(--gold); 
-            padding: 10px; border-radius: 8px; font-size: 13px; text-align: center;
+            padding: 12px; border-radius: 8px; font-size: 14px; text-align: center;
         }
 
-        /* The Flame - Scaled for Tecno */
-        #spirit-center { flex: 0 0 auto; padding: 10px 0; text-align: center; }
-        .flame-icon { font-size: 60px; filter: drop-shadow(0 0 10px var(--fire)); animation: flicker 2s infinite; }
+        /* Symbol & Big Name */
+        #spirit-center { flex: 0 0 auto; padding: 15px 0; text-align: center; }
+        .flame-icon { font-size: 70px; filter: drop-shadow(0 0 15px var(--fire)); animation: flicker 2s infinite; }
         @keyframes flicker { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .thinking { animation: intense 0.5s infinite alternate !important; }
-        @keyframes intense { from { transform: scale(1); } to { transform: scale(1.2); } }
+        
+        #kinari-title { 
+            font-size: 32px; /* Bigger than all other text */
+            font-weight: bold;
+            color: var(--gold); 
+            letter-spacing: 8px; 
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
 
-        /* Chat History - Centered and Padded */
+        /* Chat History */
         #shrine-history { 
             flex: 1; overflow-y: auto; padding: 10px 20px; 
             display: flex; flex-direction: column; gap: 15px;
-            align-items: center; /* This centers the bubbles */
+            align-items: center;
         }
         .bubble { 
-            width: 100%; max-width: 320px; /* Limits stretch on wide screens */
-            padding: 14px 18px; border-radius: 20px; font-size: 15px; line-height: 1.5; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 90%; max-width: 300px; 
+            padding: 16px; border-radius: 20px; font-size: 16px; line-height: 1.6; 
         }
-        .kinari { 
-            align-self: center; background: #111; border: 1px solid #222; 
-            border-left: 4px solid var(--gold); color: #efefef; 
-        }
-        .visitor { 
-            align-self: center; background: var(--gold); color: #000; 
-            font-weight: bold; border-bottom-right-radius: 5px; 
-        }
+        .kinari { background: #111; border-left: 5px solid var(--gold); color: #efefef; }
+        .visitor { background: var(--gold); color: #000; font-weight: bold; }
 
-        /* Input Dock - Moved UP for bottom nav bars */
+        /* Fixed Input Dock - No Stretching */
         #input-dock { 
-            background: #050505; border-top: 1px solid #222;
-            padding: 15px 15px calc(env(safe-area-inset-bottom) + 25px); /* Added extra bottom padding */
-            display: flex; gap: 10px; align-items: center;
+            background: #050505; border-top: 1px solid #333;
+            padding: 15px 20px calc(env(safe-area-inset-bottom) + 30px);
+            display: flex; justify-content: center; align-items: center; gap: 12px;
         }
         #userInput { 
-            flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; 
-            padding: 12px 18px; border-radius: 25px; font-size: 16px;
+            flex: 1; max-width: 200px; /* Prevents pushing buttons out */
+            background: #1a1a1a; border: 1px solid #444; color: #fff; 
+            padding: 12px 15px; border-radius: 25px; font-size: 16px;
         }
         .dock-btn { 
-            width: 48px; height: 48px; border-radius: 50%; border: none; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.3rem; 
+            flex: 0 0 50px; width: 50px; height: 50px; 
+            border-radius: 50%; border: none; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; 
         }
         #micBtn { background: #222; border: 1px solid var(--gold); color: var(--gold); }
-        #sendBtn { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
-
-        /* Status Text */
-        #status-label { font-size: 9px; color: var(--gold); letter-spacing: 3px; margin-top: 5px; text-transform: uppercase; }
+        #sendBtn { background: var(--gold); color: #000; }
     </style>
 </head>
 <body>
 
     <header>
-        <input type="password" id="keyField" placeholder="Enter Groq Key Here" onchange="saveKey()">
+        <input type="password" id="keyField" placeholder="Paste Key" onchange="saveKey()">
     </header>
 
     <div id="spirit-center">
         <div class="flame-icon" id="flame">🔥</div>
-        <div id="status-label">KĪNARĪ</div>
+        <div id="kinari-title">KĪNARĪ</div>
     </div>
 
     <div id="shrine-history"></div>
 
     <div id="input-dock">
         <button class="dock-btn" id="micBtn" onclick="toggleListening()">🎙️</button>
-        <input type="text" id="userInput" placeholder="Whisper to the fire..." autocomplete="off">
+        <input type="text" id="userInput" placeholder="...">
         <button class="dock-btn" id="sendBtn" onclick="consult()">🔥</button>
     </div>
 
@@ -93,18 +91,13 @@
         const shrine = document.getElementById('shrine-history');
         const input = document.getElementById('userInput');
         const keyField = document.getElementById('keyField');
-        const status = document.getElementById('status-label');
 
         window.onload = () => {
-            keyField.value = localStorage.getItem('kinari_official_key') || "";
-            addMsg('kinari', "I am Kīnarī. Speak, and I shall answer with the voice of the elders.");
+            keyField.value = localStorage.getItem('kinari_final_key') || "";
+            addMsg('kinari', "The flame is high. The voice is ready.");
         };
 
-        function saveKey() {
-            localStorage.setItem('kinari_official_key', keyField.value.trim());
-            status.innerText = "SOURCE CONNECTED";
-            setTimeout(() => status.innerText = "KĪNARĪ", 2000);
-        }
+        function saveKey() { localStorage.setItem('kinari_final_key', keyField.value.trim()); }
 
         function addMsg(role, text) {
             const div = document.createElement('div');
@@ -112,11 +105,7 @@
             div.innerText = text;
             shrine.appendChild(div);
             shrine.scrollTop = shrine.scrollHeight;
-            
-            // ACTIVATE TEXT TO SPEECH FOR KINARI
-            if(role === 'kinari') {
-                speak(text);
-            }
+            if(role === 'kinari') speakHuman(text);
         }
 
         async function consult() {
@@ -127,7 +116,6 @@
             addMsg('visitor', prompt);
             input.value = "";
             flame.classList.add('thinking');
-            status.innerText = "CONSULTING...";
 
             try {
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -135,45 +123,37 @@
                     headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "llama-3.3-70b-versatile",
-                        messages: [
-                            { role: "system", content: "You are Kīnarī, a wise ancestral spirit. Speak with profound, calm English wisdom. Keep responses concise but deep." },
-                            { role: "user", content: prompt }
-                        ]
+                        messages: [{ role: "system", content: "You are Kīnarī. Speak as a wise human elder." }, { role: "user", content: prompt }]
                     })
                 });
                 const data = await res.json();
                 addMsg('kinari', data.choices[0].message.content);
-            } catch (e) {
-                addMsg('kinari', "The flame flickered. Check your source connection.");
-            } finally {
-                flame.classList.remove('thinking');
-                status.innerText = "KĪNARĪ";
-            }
+            } catch (e) { addMsg('kinari', "Connection lost."); }
+            finally { flame.classList.remove('thinking'); }
         }
 
-        // --- THE VOICE ENGINE ---
-        function speak(text) {
-            window.speechSynthesis.cancel(); // Stop any current talking
+        // --- HUMAN VOICE EMULATION ---
+        function speakHuman(text) {
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Try to find a wise, deep voice
             const voices = window.speechSynthesis.getVoices();
-            utterance.voice = voices.find(v => v.name.includes('Google UK English Male')) || voices[0];
             
-            utterance.pitch = 0.8; // Lower pitch for wisdom
-            utterance.rate = 0.9;  // Slower rate for clarity
+            // Look for 'Natural' or 'Premium' voices on the phone
+            let humanVoice = voices.find(v => v.name.includes('Natural') || v.name.includes('Premium') || v.lang === 'en-GB');
+            utterance.voice = humanVoice || voices[0];
+            
+            utterance.pitch = 0.75; // Deep human resonance
+            utterance.rate = 0.85;  // Slow, thoughtful pace
+            utterance.volume = 1.0;
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- THE MICROPHONE ---
         function toggleListening() {
-            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!Speech) return alert("Mic not supported.");
-            
+            const Speech = window.webkitSpeechRecognition || window.SpeechRecognition;
             const rec = new Speech();
-            rec.onstart = () => { status.innerText = "LISTENING..."; flame.style.opacity = "0.5"; };
+            rec.onstart = () => flame.style.opacity = "0.4";
             rec.onresult = (e) => { input.value = e.results[0][0].transcript; consult(); };
-            rec.onend = () => { status.innerText = "KĪNARĪ"; flame.style.opacity = "1"; };
+            rec.onend = () => flame.style.opacity = "1";
             rec.start();
         }
     </script>
