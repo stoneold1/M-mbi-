@@ -155,19 +155,21 @@ main { flex: 1; display: flex; flex-direction: column; position: relative; width
   }
 
 textarea {
-  flex: 1; 
-  background: transparent; 
-  border: none; 
-  outline: none;
-  color: var(--text-main); 
+  flex: 1 !important; 
+  background: transparent !important; 
+  border: none !important; 
+  outline: none !important;
+  color: var(--text-main) !important; 
   font-family: var(--font-body); 
   font-size: 1.2rem; 
-  resize: none;
+  resize: none !important;
   
-  /* ADD THESE THREE LINES */
-  height: 35px;         /* Forces a starting height */
-  min-height: 35px;     /* Prevents collapse */
-  line-height: 1.5;     /* Keeps text centered */
+  /* THIS PART STOPS THE COLLAPSE */
+  height: 45px !important;       /* Forces it to start at 45px */
+  min-height: 45px !important;   /* Never lets it go below 45px */
+  line-height: 1.5;
+  padding: 8px 0;                /* Gives the text some breathing room */
+  box-sizing: border-box;        /* Ensures padding doesn't shrink the box */
 }
 }
 </style>
@@ -528,16 +530,18 @@ document.getElementById('user-input').addEventListener('input', function() {
 
 /* KEEP THIS ONE - It handles the "Enter" key to send */
 document.getElementById('user-input').addEventListener('input', function() {
-    // 1. Reset to 'auto' to calculate the true scrollHeight
-    this.style.height = 'auto'; 
+    // 1. Reset the style height to nothing first
+    this.style.setProperty('height', 'auto', 'important');
     
-    // 2. Set the height to the scrollHeight, but keep it between 35px and 200px
+    // 2. Calculate the new height
     let newHeight = this.scrollHeight;
     
-    if (newHeight < 35) newHeight = 35;
-    if (newHeight > 200) newHeight = 200;
-    
-    this.style.height = newHeight + 'px';
+    // 3. If the content is larger than our 45px base, grow it
+    if (newHeight > 45) {
+        this.style.setProperty('height', newHeight + 'px', 'important');
+    } else {
+        this.style.setProperty('height', '45px', 'important');
+    }
 });
 
 /* This must always be the very last line */
