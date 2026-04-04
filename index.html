@@ -87,11 +87,67 @@ textarea {
 .panel { background: var(--nav-bg); width: 90%; max-width: 600px; padding: 30px; border-radius: 20px; border: 1px solid var(--accent); }
 .search-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--accent); color: white; border-radius: 8px; margin-bottom: 20px; }
 
+/* ── Mobile Optimization for Tecno Pop 9 ────────────────── */
 @media (max-width: 800px) {
-  nav { width: 80px; padding: 20px 5px; }
-  .nav-btn span, .nav-brand span { display: none; }
-  .chat-viewport { padding: 20px; }
-  .input-container { left: 10px; right: 10px; }
+  body {
+    flex-direction: column; /* Stacks nav and main vertically */
+    overflow: auto; /* Allows the whole screen to scroll if needed */
+  }
+
+  nav {
+    width: 100% !important; /* Sidebar takes full width */
+    height: auto !important; /* Shrinks to fit icons */
+    flex-direction: row !important; /* Icons sit side-by-side */
+    justify-content: space-around;
+    padding: 10px 5px !important;
+    position: sticky;
+    top: 0;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(196,124,26,0.2);
+  }
+
+  .nav-brand {
+    margin-bottom: 0 !important;
+    font-size: 1.2rem !important;
+    padding-left: 5px !important;
+  }
+
+  .nav-btn {
+    margin-bottom: 0 !important;
+    padding: 10px !important;
+    border: none !important; /* Cleaner look for mobile */
+  }
+
+  .nav-btn span, .nav-brand span {
+    display: none; /* Hides text labels to save space */
+  }
+
+  main {
+    height: calc(100vh - 70px); /* Fill remaining screen */
+  }
+
+  .chat-viewport {
+    padding: 20px 5% 120px 5% !important; /* More space for text */
+  }
+
+  .msg-text {
+    font-size: 1.1rem !important; /* Smaller, readable text for mobile */
+  }
+
+  .input-container {
+    left: 5% !important;
+    right: 5% !important;
+    bottom: 20px !important;
+  }
+  
+  .input-pill {
+    padding: 10px 20px !important;
+  }
+
+  textarea {
+    font-size: 1.1rem !important;
+  }
+}
 }
 </style>
 </head>
