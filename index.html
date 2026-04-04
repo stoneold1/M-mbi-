@@ -434,41 +434,62 @@ function performSearch() {
 }
 
 function openDrawer(id) { 
+    // Use flex for the overlay layout
     document.getElementById(id).style.display = 'flex'; 
- if(id === 'history-overlay') {
+
+    if(id === 'history-overlay') {
         const list = document.getElementById('session-list');
         list.innerHTML = '';
+        
+        // Sort sessions by date (newest first)
         const sortedIds = Object.keys(sessions).sort((a, b) => b - a);
         
         sortedIds.forEach(id => {
             const item = document.createElement('div');
-            item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid rgba(196,124,26,0.1);';
+            // Cleaned up styles using CSS variables for the Obsidian theme
+            item.style.cssText = `
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center; 
+                padding: 15px; 
+                border-bottom: 1px solid var(--border);
+                background: var(--panel);
+                margin-bottom: 2px;
+            `;
 
             const info = document.createElement('div');
             info.style.flex = '1';
-            info.innerHTML = `<small style="opacity:0.6">${sessions[id].date}</small><br><strong>${sessions[id].title}</strong>`;
-            info.onclick = () => { loadSession(id); document.getElementById('history-overlay').style.display='none'; };
+            info.style.cursor = 'pointer';
+            // Styled text for the Obsidian vibe
+            info.innerHTML = `
+                <small style="color: var(--accent); opacity: 0.7;">${sessions[id].date}</small><br>
+                <strong style="color: var(--text);">${sessions[id].title}</strong>
+            `;
+            info.onclick = () => { 
+                loadSession(id); 
+                document.getElementById('history-overlay').style.display = 'none'; 
+            };
             
-            // The Action Buttons Container
             const actions = document.createElement('div');
             actions.style.display = 'flex';
-            actions.style.gap = '10px';
+            actions.style.gap = '8px';
 
-            const btnStyle = 'background:none; border:none; cursor:pointer; font-size:1.2rem; padding:5px;';
-
-            // Share Button
+            // --- 📤 SHARE BUTTON ---
             const sBtn = document.createElement('button');
-            sBtn.innerHTML = '📤'; sBtn.style.cssText = btnStyle;
+            sBtn.innerHTML = '📤'; 
+            sBtn.className = 'icon-btn'; // Uses the Obsidian Gold styling
             sBtn.onclick = (e) => shareSession(id, e);
 
-            // Rename Button
+            // --- ✏️ RENAME BUTTON ---
             const rBtn = document.createElement('button');
-            rBtn.innerHTML = '✏️'; rBtn.style.cssText = btnStyle;
+            rBtn.innerHTML = '✏️'; 
+            rBtn.className = 'icon-btn'; 
             rBtn.onclick = (e) => renameSession(id, e);
 
-            // Delete Button
+            // --- 🗑️ DELETE BUTTON ---
             const dBtn = document.createElement('button');
-            dBtn.innerHTML = '🗑️'; dBtn.style.cssText = btnStyle;
+            dBtn.innerHTML = '🗑️'; 
+            dBtn.className = 'icon-btn'; 
             dBtn.onclick = (e) => deleteSession(id, e);
 
             actions.append(sBtn, rBtn, dBtn);
