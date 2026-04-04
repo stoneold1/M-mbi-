@@ -527,11 +527,17 @@ document.getElementById('user-input').addEventListener('input', function() {
 });
 
 /* KEEP THIS ONE - It handles the "Enter" key to send */
-document.getElementById('user-input').addEventListener('keydown', (e) => { 
-    if (e.key === 'Enter' && !e.shiftKey) { 
-        e.preventDefault(); 
-        send(); 
-    } 
+document.getElementById('user-input').addEventListener('input', function() {
+    // 1. Reset to 'auto' to calculate the true scrollHeight
+    this.style.height = 'auto'; 
+    
+    // 2. Set the height to the scrollHeight, but keep it between 35px and 200px
+    let newHeight = this.scrollHeight;
+    
+    if (newHeight < 35) newHeight = 35;
+    if (newHeight > 200) newHeight = 200;
+    
+    this.style.height = newHeight + 'px';
 });
 
 /* This must always be the very last line */
