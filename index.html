@@ -25,22 +25,34 @@
 }
 
 body {
-    background-color: #050505 !important; /* Absolute Black */
-    color: #ffffff !important;           /* Absolute White */
     margin: 0;
-    font-family: sans-serif;
-}
-
-/* Force the History Drawer to be Dark */
-.overlay {
-    background-color: #000000 !important;
+    padding: 0;
+    display: flex; /* This is the magic wand */
+    height: 100vh;
+    width: 100vw;
+    background-color: #050505 !important;
     color: #ffffff !important;
+    overflow: hidden;
 }
 
-/* Ensure the Whisper items are Dark */
-#session-list div {
-    background-color: #121212 !important;
-    border-bottom: 1px solid rgba(255, 179, 0, 0.2) !important;
+/* The Left Rail (Sidebar) */
+#history-sidebar {
+    width: 300px; /* Fixed width for the rail */
+    height: 100vh;
+    background-color: #0a0a0a;
+    border-right: 1px solid rgba(255, 179, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Prevents the rail from getting squished */
+}
+
+/* The Right Side (The Main Chat Area) */
+#main-content {
+    flex-grow: 1; /* Tells the chat to take up all leftover space */
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: radial-gradient(circle at top, #161616 0%, #050505 100%);
 }
 
 /* ── Left Rail ────────────────────────────────────── */
