@@ -366,6 +366,55 @@ async function deleteSession(id, event) {
     openDrawer('history-overlay');
   }
 }
+  // ── RENAME A WHISPER ────────────────────────────────
+async function renameSession(id, event) {
+  if (event) event.stopPropagation();
+  const oldTitle = sessions[id].title;
+  const newTitle = prompt("Give this whisper a new name:", oldTitle);
+  
+  if (!newTitle || newTitle === oldTitle) return;
+
+  sessions[id].title = newTitle;
+
+  // Update Cloud
+  const { error } = await _supabase
+    .from('whispers')
+    .update({ content: sessions[id] })
+    .eq('session_id', id);
+
+  if (error) {
+    alert("The cloud did not hear the new name.");
+    return;
+  }
+
+  localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
+  openDrawer('history-overlay'); // Refresh the list
+}
+
+// ── SHARE A WHISPER ────────────────────────────────
+async function shareSession(id, event) {
+  if (event) event.stopPropagation();
+  
+  const transcript = sessions[id].messages
+    .map(m => `${m.role === 'user' ? 'Me' : 'Mūmbi'}: ${m.content}`)
+    .join('\n\n');
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: `Mūmbi Whisper: ${sessions[id].title}`,
+        text: transcript,
+        url: window.location.href
+      });
+    } catch (err) {
+      console.log("Share cancelled");
+    }
+  } else {
+    // Fallback: Copy to clipboard
+    await navigator.clipboard.writeText(transcript);
+    alert("Transcript copied to clipboard! (Your device doesn't support direct sharing)");
+  }
+}
 
 function newCircle() { currentSessionId = Date.now().toString(); loadSession(currentSessionId); }
 
