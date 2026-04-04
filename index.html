@@ -309,17 +309,13 @@ async function updateSession(role, content) {
   }
   sessions[currentSessionId].messages.push({ role, content });
 
-  // This sends the whisper to the Cloud
-  try {
-    await _supabase
-      .from('whispers')
-      .upsert({ 
-        session_id: currentSessionId, 
-        content: sessions[currentSessionId] 
-      }, { onConflict: 'session_id' });
-  } catch (e) {
-    console.error("Cloud save failed.");
-  }
+  // THIS IS THE CRITICAL LINE:
+  await _supabase
+    .from('whispers')
+    .upsert({ 
+      session_id: currentSessionId, 
+      content: sessions[currentSessionId] 
+    }, { onConflict: 'session_id' });
 
   localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
 }
