@@ -339,6 +339,33 @@ function loadSession(id) {
     renderMessage('oracle', "The fire is lit. Speak, To the Source.");
   }
 }
+async function deleteSession(id, event) {
+  if (event) event.stopPropagation();
+
+  if (!confirm("Are you sure you want to erase this whisper?")) return;
+
+  // Delete from Cloud
+  const { error } = await _supabase
+    .from('whispers')
+    .delete()
+    .eq('session_id', id);
+
+  if (error) {
+    console.error("Cloud error:", error);
+    return;
+  }
+
+  // Delete from Local
+  delete sessions[id];
+  localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
+
+  // If we are on the deleted one, start fresh
+  if (currentSessionId === id) {
+    newCircle();
+  } else {
+    openDrawer('history-overlay');
+  }
+}
 
 function newCircle() { currentSessionId = Date.now().toString(); loadSession(currentSessionId); }
 
