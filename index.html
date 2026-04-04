@@ -461,14 +461,14 @@ function openDrawer(id) {
 
          const info = document.createElement('div');
             info.style.flex = '1';
-            info.style.cursor = 'pointer';
             
-            // We use hardcoded white/gold here to ensure readability
+            // We use #ffb300 for Gold and #ffffff for White
+            // 'display: block' ensures they sit on top of each other
             info.innerHTML = `
-                <small style="color: var(--accent); font-weight: bold; display: block; margin-bottom: 4px;">
+                <small style="color: #ffb300 !important; font-weight: bold; display: block; margin-bottom: 2px;">
                     ${sessions[id].date}
                 </small>
-                <strong style="color: #ffffff; font-size: 1.1rem; display: block;">
+                <strong style="color: #ffffff !important; font-size: 1.1rem; display: block;">
                     ${sessions[id].title}
                 </strong>
             `;
