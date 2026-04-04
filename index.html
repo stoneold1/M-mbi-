@@ -115,10 +115,10 @@ main { flex: 1; display: flex; flex-direction: column; position: relative; width
     max-height: 80vh; 
     overflow-y: auto; 
 }
-
 /* Mobile Adjustments for Tecno Pop 9 */
 @media (max-width: 800px) {
   body { flex-direction: column; }
+  
   nav { 
     width: 100% !important; 
     height: auto !important; 
@@ -127,10 +127,37 @@ main { flex: 1; display: flex; flex-direction: column; position: relative; width
     justify-content: space-around; 
     border-right: none; 
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0; /* Ensures nav doesn't squash */
   }
+
   nav span, .nav-brand span { display: none; }
-  .chat-viewport { padding: 20px 5% 100px 5%; }
-  .input-container { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); padding: 10px 5%; }
+
+  .chat-viewport { 
+    padding: 20px 5% 100px 5%; 
+    flex: 1; /* Forces the chat to take up all available space */
+  }
+
+  /* Fixed Input Area for Mobile */
+  .input-container { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    background: var(--bg); 
+    padding: 15px 5%; 
+    z-index: 100;
+    border-top: 1px solid var(--border);
+  }
+
+  .input-pill {
+    padding: 12px 20px !important; /* Slightly larger for touch */
+    min-height: 55px; /* Ensures it never feels "small" */
+  }
+
+  textarea {
+    font-size: 1.1rem !important;
+    max-height: 120px; /* Prevents it from covering the whole screen when typing long messages */
+  }
 }
 </style>
 </head>
@@ -478,9 +505,27 @@ function openDrawer(id) {
 }
 
 function toggleTheme() { document.body.classList.toggle('dawn'); }
-document.getElementById('user-input').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
-document.getElementById('user-input').addEventListener('input', function() { this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; });
+// ... existing functions like openDrawer, performSearch, etc.
 
+/* REPLACE YOUR OLD LISTENER WITH THIS ONE */
+document.getElementById('user-input').addEventListener('input', function() {
+    this.style.height = 'auto'; 
+    // This ensures the box is never smaller than 24px but grows with your words
+    const newHeight = Math.max(this.scrollHeight, 24); 
+    this.style.height = newHeight + 'px';
+});
+
+/* KEEP THIS ONE - It handles the "Enter" key to send */
+document.getElementById('user-input').addEventListener('keydown', (e) => { 
+    if (e.key === 'Enter' && !e.shiftKey) { 
+        e.preventDefault(); 
+        send(); 
+    } 
+});
+
+/* This must always be the very last line */
+init();
+</script>
 init();
 </script>
 </body>
