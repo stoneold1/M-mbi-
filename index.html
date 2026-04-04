@@ -257,6 +257,7 @@ async function updateSession(role, content) {
 function renderMessage(role, text) {
   const win = document.getElementById('chat-window');
   const div = document.createElement('div');
+  // This line ensures 'seeker' or 'oracle' class is added to the row
   div.className = `msg-row ${role === 'user' ? 'seeker' : 'oracle'}`;
   div.innerHTML = `<div class="msg-label">${role === 'user' ? 'Seeker' : 'Mūmbi'}</div><div class="msg-text">${text}</div>`;
   win.appendChild(div);
