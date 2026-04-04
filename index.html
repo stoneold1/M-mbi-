@@ -438,37 +438,41 @@ function openDrawer(id) {
  if(id === 'history-overlay') {
         const list = document.getElementById('session-list');
         list.innerHTML = '';
-        
-        // Newest conversations at the top
         const sortedIds = Object.keys(sessions).sort((a, b) => b - a);
         
         sortedIds.forEach(id => {
             const item = document.createElement('div');
-            item.style.display = 'flex';
-            item.style.justifyContent = 'space-between';
-            item.style.alignItems = 'center';
-            item.style.padding = '12px';
-            item.style.borderBottom = '1px solid rgba(196,124,26,0.1)';
-            item.style.cursor = 'pointer';
+            item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid rgba(196,124,26,0.1);';
 
-            const textSpan = document.createElement('span');
-            textSpan.innerText = `${sessions[id].date} - ${sessions[id].title}`;
-            textSpan.style.flex = '1';
-            textSpan.onclick = () => { 
-                loadSession(id); 
-                document.getElementById('history-overlay').style.display='none'; 
-            };
+            const info = document.createElement('div');
+            info.style.flex = '1';
+            info.innerHTML = `<small style="opacity:0.6">${sessions[id].date}</small><br><strong>${sessions[id].title}</strong>`;
+            info.onclick = () => { loadSession(id); document.getElementById('history-overlay').style.display='none'; };
             
-            const deleteBtn = document.createElement('button');
-            deleteBtn.innerHTML = '🗑️';
-            deleteBtn.style.background = 'none';
-            deleteBtn.style.border = 'none';
-            deleteBtn.style.padding = '5px 10px';
-            deleteBtn.style.cursor = 'pointer';
-            deleteBtn.onclick = (e) => deleteSession(id, e);
+            // The Action Buttons Container
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '10px';
 
-            item.appendChild(textSpan);
-            item.appendChild(deleteBtn);
+            const btnStyle = 'background:none; border:none; cursor:pointer; font-size:1.2rem; padding:5px;';
+
+            // Share Button
+            const sBtn = document.createElement('button');
+            sBtn.innerHTML = '📤'; sBtn.style.cssText = btnStyle;
+            sBtn.onclick = (e) => shareSession(id, e);
+
+            // Rename Button
+            const rBtn = document.createElement('button');
+            rBtn.innerHTML = '✏️'; rBtn.style.cssText = btnStyle;
+            rBtn.onclick = (e) => renameSession(id, e);
+
+            // Delete Button
+            const dBtn = document.createElement('button');
+            dBtn.innerHTML = '🗑️'; dBtn.style.cssText = btnStyle;
+            dBtn.onclick = (e) => deleteSession(id, e);
+
+            actions.append(sBtn, rBtn, dBtn);
+            item.append(info, actions);
             list.appendChild(item);
         });
     }
