@@ -460,14 +460,18 @@ function openDrawer(id) {
                 border-radius: 8px; /* Added slight rounding for a modern feel */
             `;
 
-            const info = document.createElement('div');
+         const info = document.createElement('div');
             info.style.flex = '1';
             info.style.cursor = 'pointer';
             
-            // Using the NEW --accent for the date to make it pop
+            // We use hardcoded white/gold here to ensure readability
             info.innerHTML = `
-                <small style="color: var(--accent); font-weight: bold; letter-spacing: 1px;">${sessions[id].date}</small><br>
-                <strong style="color: var(--text); font-size: 1.1rem;">${sessions[id].title}</strong>
+                <small style="color: var(--accent); font-weight: bold; display: block; margin-bottom: 4px;">
+                    ${sessions[id].date}
+                </small>
+                <strong style="color: #ffffff; font-size: 1.1rem; display: block;">
+                    ${sessions[id].title}
+                </strong>
             `;
             
             info.onclick = () => { 
