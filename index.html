@@ -386,14 +386,40 @@ function performSearch() {
 
 function openDrawer(id) { 
     document.getElementById(id).style.display = 'flex'; 
-    if(id === 'history-overlay') {
+ if(id === 'history-overlay') {
         const list = document.getElementById('session-list');
         list.innerHTML = '';
-        Object.keys(sessions).forEach(id => {
+        
+        // Newest conversations at the top
+        const sortedIds = Object.keys(sessions).sort((a, b) => b - a);
+        
+        sortedIds.forEach(id => {
             const item = document.createElement('div');
-            item.style.padding = '10px'; item.style.cursor = 'pointer';
-            item.innerText = `${sessions[id].date} - ${sessions[id].title}`;
-            item.onclick = () => { loadSession(id); document.getElementById('history-overlay').style.display='none'; };
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            item.style.padding = '12px';
+            item.style.borderBottom = '1px solid rgba(196,124,26,0.1)';
+            item.style.cursor = 'pointer';
+
+            const textSpan = document.createElement('span');
+            textSpan.innerText = `${sessions[id].date} - ${sessions[id].title}`;
+            textSpan.style.flex = '1';
+            textSpan.onclick = () => { 
+                loadSession(id); 
+                document.getElementById('history-overlay').style.display='none'; 
+            };
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.style.background = 'none';
+            deleteBtn.style.border = 'none';
+            deleteBtn.style.padding = '5px 10px';
+            deleteBtn.style.cursor = 'pointer';
+            deleteBtn.onclick = (e) => deleteSession(id, e);
+
+            item.appendChild(textSpan);
+            item.appendChild(deleteBtn);
             list.appendChild(item);
         });
     }
