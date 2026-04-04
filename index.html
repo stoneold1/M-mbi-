@@ -74,15 +74,46 @@ main { flex: 1; display: flex; flex-direction: column; position: relative; width
   display: flex; flex-direction: column; gap: 30px;
 }
 
-.msg-row { display: flex; flex-direction: column; margin-bottom: 10px; }
-.msg-label { font-family: var(--font-title); font-size: 0.8rem; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; }
-.msg-text { font-size: 1.25rem; line-height: 1.6; color: var(--text-main); }
-.oracle .msg-text { border-left: 3px solid var(--oracle-line); padding-left: 15px; }
+.msg-row { 
+  display: flex; 
+  flex-direction: column; 
+  margin-bottom: 25px; 
+  padding: 15px;
+  border-radius: 12px;
+}
 
-.input-container { padding: 20px 10%; background: var(--bg); }
-.input-pill {
-  background: var(--input-bg); border: 1px solid var(--border);
-  border-radius: 35px; padding: 12px 25px; display: flex; align-items: center; gap: 15px;
+/* The Seeker's Highlighted Field */
+.seeker { 
+  background-color: rgba(128, 128, 128, 0.15); /* Soft Grey */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Light Mode (Dawn) adjustment for the Seeker field */
+body.dawn .seeker {
+  background-color: rgba(0, 0, 0, 0.05); /* Darker grey for light background */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.msg-label { 
+  font-family: var(--font-title); 
+  font-size: 0.75rem; 
+  color: var(--accent); 
+  margin-bottom: 8px; 
+  text-transform: uppercase; 
+  letter-spacing: 1px;
+}
+
+.msg-text { 
+  font-size: 1.25rem; 
+  line-height: 1.6; 
+  color: var(--text-main); 
+}
+
+/* Mūmbi remains elegant with the side line, no background */
+.oracle { background: transparent; }
+.oracle .msg-text { 
+  border-left: 3px solid var(--oracle-line); 
+  padding-left: 15px; 
 }
 
 textarea {
