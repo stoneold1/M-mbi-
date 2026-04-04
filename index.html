@@ -16,15 +16,21 @@
   
 <style>
 :root {
-  /* Deep Midnight Obsidian */
-  --bg: #020205;             /* Almost Pure Black with a hint of Blue */
-  --panel: #0a0a0f;          /* Darker, cooler panels */
-  --text: #ffffff;           /* Pure White for clarity */
-  --accent: #ffb300;         /* "Electric Gold" - brighter than the old one */
-  --oracle-msg: #121218;     /* Deep Slate bubble */
-  --user-msg: #ffb300;       /* Brighter Gold for the user */
-  --input-bg: #0f0f15;
-  --border: rgba(255, 179, 0, 0.25); /* Sharp Gold border */
+  --bg: #050505;
+  --panel: #121212;
+  --text: #ffffff !important; /* The !important force-feeds white text to the browser */
+  --accent: #ffb300;
+  --border: rgba(255, 179, 0, 0.3);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text); /* Forces white text globally */
+}
+
+/* Force all headings and bold text to stay light */
+strong, span, div, small, p {
+  color: var(--text);
 }
 body.dawn {
   --bg: #f5ede0; --nav-bg: #e8dfcc; --text-main: #1a0e06; --text-sub: #5a4a3a; --input-bg: #ffffff;
