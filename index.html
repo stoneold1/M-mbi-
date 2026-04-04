@@ -154,10 +154,21 @@ main { flex: 1; display: flex; flex-direction: column; position: relative; width
     min-height: 55px; /* Ensures it never feels "small" */
   }
 
-  textarea {
-    font-size: 1.1rem !important;
-    max-height: 120px; /* Prevents it from covering the whole screen when typing long messages */
-  }
+textarea {
+  flex: 1; 
+  background: transparent; 
+  border: none; 
+  outline: none;
+  color: var(--text-main); 
+  font-family: var(--font-body); 
+  font-size: 1.2rem; 
+  resize: none;
+  
+  /* ADD THESE THREE LINES */
+  height: 35px;         /* Forces a starting height */
+  min-height: 35px;     /* Prevents collapse */
+  line-height: 1.5;     /* Keeps text centered */
+}
 }
 </style>
 </head>
