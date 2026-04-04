@@ -433,37 +433,37 @@ function performSearch() {
 }
 
 function openDrawer(id) { 
-    // Use flex for the overlay layout
     document.getElementById(id).style.display = 'flex'; 
 
     if(id === 'history-overlay') {
         const list = document.getElementById('session-list');
         list.innerHTML = '';
         
-        // Sort sessions by date (newest first)
         const sortedIds = Object.keys(sessions).sort((a, b) => b - a);
         
         sortedIds.forEach(id => {
             const item = document.createElement('div');
-            // Cleaned up styles using CSS variables for the Obsidian theme
             item.style.cssText = `
                 display: flex; 
                 justify-content: space-between; 
                 align-items: center; 
-                padding: 15px; 
+                padding: 16px; 
                 border-bottom: 1px solid var(--border);
                 background: var(--panel);
-                margin-bottom: 2px;
+                margin-bottom: 4px;
+                border-radius: 8px; /* Added slight rounding for a modern feel */
             `;
 
             const info = document.createElement('div');
             info.style.flex = '1';
             info.style.cursor = 'pointer';
-            // Styled text for the Obsidian vibe
+            
+            // Using the NEW --accent for the date to make it pop
             info.innerHTML = `
-                <small style="color: var(--accent); opacity: 0.7;">${sessions[id].date}</small><br>
-                <strong style="color: var(--text);">${sessions[id].title}</strong>
+                <small style="color: var(--accent); font-weight: bold; letter-spacing: 1px;">${sessions[id].date}</small><br>
+                <strong style="color: var(--text); font-size: 1.1rem;">${sessions[id].title}</strong>
             `;
+            
             info.onclick = () => { 
                 loadSession(id); 
                 document.getElementById('history-overlay').style.display = 'none'; 
@@ -471,27 +471,24 @@ function openDrawer(id) {
             
             const actions = document.createElement('div');
             actions.style.display = 'flex';
-            actions.style.gap = '8px';
+            actions.style.gap = '12px';
 
-            // --- 📤 SHARE BUTTON ---
-            const sBtn = document.createElement('button');
-            sBtn.innerHTML = '📤'; 
-            sBtn.className = 'icon-btn'; // Uses the Obsidian Gold styling
-            sBtn.onclick = (e) => shareSession(id, e);
+            const buttons = [
+                { icon: '📤', func: shareSession },
+                { icon: '✏️', func: renameSession },
+                { icon: '🗑️', func: deleteSession }
+            ];
 
-            // --- ✏️ RENAME BUTTON ---
-            const rBtn = document.createElement('button');
-            rBtn.innerHTML = '✏️'; 
-            rBtn.className = 'icon-btn'; 
-            rBtn.onclick = (e) => renameSession(id, e);
+            buttons.forEach(btnInfo => {
+                const btn = document.createElement('button');
+                btn.innerHTML = btnInfo.icon; 
+                btn.className = 'icon-btn';
+                // Overriding icon-btn style slightly to ensure it uses the NEW --accent
+                btn.style.color = 'var(--accent)';
+                btn.onclick = (e) => btnInfo.func(id, e);
+                actions.append(btn);
+            });
 
-            // --- 🗑️ DELETE BUTTON ---
-            const dBtn = document.createElement('button');
-            dBtn.innerHTML = '🗑️'; 
-            dBtn.className = 'icon-btn'; 
-            dBtn.onclick = (e) => deleteSession(id, e);
-
-            actions.append(sBtn, rBtn, dBtn);
             item.append(info, actions);
             list.appendChild(item);
         });
