@@ -143,33 +143,37 @@ const _supabase = createClient(supabaseUrl, supabaseKey);
 let currentId = Date.now().toString();
 let sessions = JSON.parse(localStorage.getItem('mumbi_sessions') || '{}');
 
+// Improved Init: Clears old data and pulls fresh from cloud
 async function init() {
   const key = localStorage.getItem('mumbi_groq_key') || prompt("Enter Groq Key:");
   if(key) localStorage.setItem('mumbi_groq_key', key);
 
   try {
-    // 1. Await the data from Supabase
     const { data, error } = await _supabase.from('whispers').select('*');
-    
     if (error) {
-      console.error("Supabase Error:", error);
+      console.error("Supabase Error:", error.message);
     } else if (data) {
-      // 2. Merge cloud data into our local sessions object
-      data.forEach(r => { 
-        sessions[r.session_id] = r.content; 
-      });
-      // 3. Update LocalStorage so they match
+      // Clear local memory and replace with Cloud data
+      sessions = {}; 
+      data.forEach(r => { sessions[r.session_id] = r.content; });
       localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
+      console.log("Sync Complete: " + data.length + " whispers found.");
     }
-  } catch(e) {
-    console.error("Connection failed:", e);
-  }
+  } catch(e) { console.error("Sync Failed:", e); }
 
   renderHistory();
-  if(Object.keys(sessions).length > 0) {
-    const lastSession = Object.keys(sessions).sort().pop();
-    loadSession(lastSession);
-  }
+  const keys = Object.keys(sessions);
+  if(keys.length > 0) loadSession(keys.sort().pop());
+}
+
+// Improved Save: Explicitly handles conflicts
+function save() { 
+    _supabase.from('whispers')
+      .upsert({ session_id: currentId, content: sessions[currentId] })
+      .then(({ error }) => { if(error) console.error("Cloud Save Failed:", error.message); });
+    
+    localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); 
+}
 }
 
 function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
