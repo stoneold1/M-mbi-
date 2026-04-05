@@ -18,44 +18,30 @@
 :root {
   --bg: #050505;
   --panel: #121212;
-  --text-main: #ffffff;
-  /* Use a golden-orange for the 'pulse' */
-  --glow: rgba(255, 179, 0, 0.3); 
+  --text: #ffffff !important; /* The !important force-feeds white text to the browser */
   --accent: #ffb300;
-  --font-oracle: 'Cinzel', serif;
+  --border: rgba(255, 179, 0, 0.3);
 }
 
 body {
   background-color: var(--bg);
-  color: var(--text-main);
-  /* This changes EVERY text in the app */
-  font-family: var(--font-oracle) !important; 
-  font-size: 18px;
-  line-height: 1.6;
-  
-  /* This adds the "vibration beneath the skin" effect globally */
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.1), 0 0 10px var(--glow);
-  letter-spacing: 0.5px;
+  color: var(--text); /* Forces white text globally */
 }
 
-/* Ensure buttons and inputs also follow the Oracle's voice */
-button, textarea, input, span, div {
-  font-family: var(--font-oracle) !important;
+/* Force all headings and bold text to stay light */
+strong, span, div, small, p {
+  color: var(--text);
+}
+body.dawn {
+  --bg: #f5ede0; --nav-bg: #e8dfcc; --text-main: #1a0e06; --text-sub: #5a4a3a; --input-bg: #ffffff;
 }
 
-/* The Seeker's text should feel slightly more weighted */
-.seeker .msg-text {
-  font-weight: 400;
-  letter-spacing: 1px;
-  color: #fdfdfd;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Mūmbi's response (The Oracle) */
-.oracle .msg-text {
-  font-weight: 500;
-  color: #fff;
-  /* A slightly stronger glow for the Oracle's words */
-  text-shadow: 0 0 15px rgba(196, 124, 26, 0.5); 
+body {
+  background-color: var(--bg); color: var(--text-main);
+  font-family: var(--font-body); font-size: 22px;
+  display: flex; height: 100vh; overflow: hidden;
 }
 
 /* ── Left Rail ────────────────────────────────────── */
@@ -113,7 +99,7 @@ body.dawn .seeker {
 
 .msg-label { 
   font-family: var(--font-title); 
-  font-size: 1.00rem; 
+  font-size: 0.75rem; 
   color: var(--accent); 
   margin-bottom: 8px; 
   text-transform: uppercase; 
@@ -214,7 +200,6 @@ textarea {
   }
 }
 }
-
 </style>
 </head>
 <body>
