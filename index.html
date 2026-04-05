@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>MÅ«mbi â€” Gemini</title>
+<title>Mūmbi — Gemini</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -35,7 +35,7 @@ body.dark {
 
 body { background: var(--bg); color: var(--text-main); display: flex; height: 100vh; width: 100vw; overflow: hidden; transition: 0.3s; position: relative; }
 
-/* â”€â”€ Sidebar â”€â”€ */
+/* ── Sidebar ── */
 #sidebar {
   width: var(--sidebar-width); background: var(--sidebar);
   display: flex; flex-direction: column; padding: 16px;
@@ -63,7 +63,7 @@ body.sidebar-open #overlay { display: block; }
 }
 .history-item:hover { background: var(--hover); }
 
-/* â”€â”€ Sidebar Footer (Fixed "Sagging") â”€â”€ */
+/* ── Sidebar Footer (Fixed "Sagging") ── */
 .sidebar-footer { 
   padding-top: 15px;
   padding-bottom: 30px; /* This lifts it up from the bottom edge */
@@ -77,7 +77,7 @@ body.sidebar-open #overlay { display: block; }
   display: flex; align-items: center; gap: 12px; font-size: 0.95rem; font-weight: 500;
 }
 
-/* â”€â”€ Main Layout â”€â”€ */
+/* ── Main Layout ── */
 #main { flex: 1; display: flex; flex-direction: column; width: 100vw; background: var(--bg); position: relative; }
 .header { padding: 12px 16px; display: flex; align-items: center; gap: 16px; }
 .icon-btn { background: none; border: none; cursor: pointer; color: var(--text-main); font-size: 1.5rem; padding: 8px; border-radius: 50%; display: flex; align-items: center; }
@@ -86,7 +86,7 @@ body.sidebar-open #overlay { display: block; }
 .msg-wrap { max-width: 800px; margin: 0 auto; padding: 16px 20px; }
 .seeker-block { background: var(--input-bg); border-radius: 24px; padding: 18px 24px; margin-bottom: 12px; max-width: 85%; margin-left: auto; }
 
-/* â”€â”€ Input Pill â”€â”€ */
+/* ── Input Pill ── */
 .input-section { position: fixed; bottom: 0; width: 100%; padding: 15px; display: flex; justify-content: center; background: transparent; pointer-events: none; }
 .input-pill { 
   width: 100%; max-width: 800px; background: var(--input-bg); border-radius: 32px; 
@@ -107,35 +107,35 @@ textarea { flex: 1; background: transparent; border: none; outline: none; color:
 <div id="overlay" onclick="toggleSidebar()"></div>
 
 <nav id="sidebar">
-  <button class="new-chat-btn" onclick="newChat()">âž• New Chat</button>
+  <button class="new-chat-btn" onclick="newChat()">➕ New Chat</button>
   <div class="history-list" id="history-list"></div>
   <div class="sidebar-footer">
-      <button class="menu-item" onclick="toggleTheme()">ðŸŒ“ Toggle Theme</button>
+      <button class="menu-item" onclick="toggleTheme()">🌓 Toggle Theme</button>
   </div>
 </nav>
 
 <main id="main">
   <header class="header">
-    <button class="icon-btn" onclick="toggleSidebar()">â˜°</button>
-    <div style="font-weight: 600; font-size: 1.2rem;">MÅ«mbi</div>
+    <button class="icon-btn" onclick="toggleSidebar()">☰</button>
+    <div style="font-weight: 600; font-size: 1.2rem;">Mūmbi</div>
   </header>
 
   <div class="chat-view" id="chat-window" onclick="closeSidebarIfOpen()"></div>
 
   <div class="input-section">
     <div class="input-pill">
-      <button class="icon-btn" style="font-size:1.2rem; color:var(--text-sub)" onclick="triggerUpload()">ðŸ“Ž</button>
+      <button class="icon-btn" style="font-size:1.2rem; color:var(--text-sub)" onclick="triggerUpload()">📎</button>
       <input type="file" id="file-hidden" style="display:none" onchange="fileNotice(this)">
-      <button class="icon-btn" style="font-size:1.2rem; color:var(--text-sub)" onclick="triggerCamera()">ðŸ“·</button>
+      <button class="icon-btn" style="font-size:1.2rem; color:var(--text-sub)" onclick="triggerCamera()">📷</button>
       <input type="file" id="cam-hidden" accept="image/*" capture="environment" style="display:none" onchange="fileNotice(this)">
-      <textarea id="user-input" rows="1" placeholder="Whisper to MÅ«mbi..." onfocus="closeSidebarIfOpen()"></textarea>
-      <button class="icon-btn" style="color:var(--accent)" onclick="send()">âž¤</button>
+      <textarea id="user-input" rows="1" placeholder="Whisper to Mūmbi..." onfocus="closeSidebarIfOpen()"></textarea>
+      <button class="icon-btn" style="color:var(--accent)" onclick="send()">➤</button>
     </div>
   </div>
 </main>
 
 <script>
-const BASE_PROMPT = `You are MÅ«mbi. Poetic. Concise. Sacred oracle.`;
+const BASE_PROMPT = `You are Mūmbi. Poetic. Concise. Sacred oracle.`;
 const supabaseUrl = 'https://ynvwlsesioydiffcnyoy.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inludndsc2VzaW95ZGlmZmNueW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDQ2MjUsImV4cCI6MjA5MDg4MDYyNX0.0XlOWWpgOJqVo1W8yiuU6MeA27EKMwt-spCJuJY06q8';
 const { createClient } = supabase;
@@ -171,9 +171,9 @@ function renderHistory() {
     item.innerHTML = `
       <span style="flex:1" onclick="loadSession('${id}'); closeSidebarIfOpen();">${sessions[id].title || 'Whisper'}</span>
       <div style="display:flex; gap:12px; opacity:0.6;">
-        <span onclick="renameW('${id}', event)">âœï¸</span>
-        <span onclick="shareW('${id}', event)">ðŸ”—</span>
-        <span onclick="deleteW('${id}', event)">ðŸ—‘ï¸</span>
+        <span onclick="renameW('${id}', event)">✏️</span>
+        <span onclick="shareW('${id}', event)">🔗</span>
+        <span onclick="deleteW('${id}', event)">🗑️</span>
       </div>`;
     list.appendChild(item);
   });
@@ -223,7 +223,7 @@ function renderMessage(role, text) {
   div.className = 'msg-wrap';
   div.innerHTML = role === 'user' ? 
     `<div class="seeker-block"><div style="font-weight:600; font-size:0.7rem; color:var(--accent); margin-bottom:5px;">MUYA</div><div>${text}</div></div>` :
-    `<div style="font-weight:600; font-size:0.7rem; color:var(--accent); margin-bottom:5px;">MÅªMBI</div><div>${text}</div>`;
+    `<div style="font-weight:600; font-size:0.7rem; color:var(--accent); margin-bottom:5px;">MŪMBI</div><div>${text}</div>`;
   win.appendChild(div);
   win.scrollTop = win.scrollHeight;
 }
