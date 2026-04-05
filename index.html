@@ -96,10 +96,7 @@ body.sidebar-open #overlay { display: block; }
 }
 textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 1rem; resize: none; max-height: 150px; padding: 10px 0; }
 
-@media (min-width: 1000px) {
-  #sidebar { position: relative; transform: translateX(0); z-index: 100; box-shadow: none; }
-  #overlay { display: none !important; }
-}
+
 </style>
 </head>
 <body class="dark">
@@ -149,12 +146,30 @@ let sessions = JSON.parse(localStorage.getItem('mumbi_sessions') || '{}');
 async function init() {
   const key = localStorage.getItem('mumbi_groq_key') || prompt("Enter Groq Key:");
   if(key) localStorage.setItem('mumbi_groq_key', key);
+
   try {
-    const { data } = await _supabase.from('whispers').select('*');
-    if(data) data.forEach(r => { sessions[r.session_id] = r.content; });
-  } catch(e){}
+    // 1. Await the data from Supabase
+    const { data, error } = await _supabase.from('whispers').select('*');
+    
+    if (error) {
+      console.error("Supabase Error:", error);
+    } else if (data) {
+      // 2. Merge cloud data into our local sessions object
+      data.forEach(r => { 
+        sessions[r.session_id] = r.content; 
+      });
+      // 3. Update LocalStorage so they match
+      localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
+    }
+  } catch(e) {
+    console.error("Connection failed:", e);
+  }
+
   renderHistory();
-  if(Object.keys(sessions).length > 0) loadSession(Object.keys(sessions).sort().pop());
+  if(Object.keys(sessions).length > 0) {
+    const lastSession = Object.keys(sessions).sort().pop();
+    loadSession(lastSession);
+  }
 }
 
 function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
