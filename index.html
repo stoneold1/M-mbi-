@@ -210,8 +210,18 @@ textarea {
 
 <div id="scrolls-overlay" class="overlay" onclick="this.style.display='none'">
   <div class="panel" onclick="event.stopPropagation()">
-    <h2 style="font-family:var(--font-title); color:var(--accent); margin-bottom:15px;">Sacred Scrolls</h2>
-    <p>Mwenenyaga: Absolute Light.<br>Ngai: The Sustainer.<br>Mūmbi: The Creative Vessel.</p>
+    <h2 style="font-family:var(--font-title); color:var(--accent); margin-bottom:15px; text-align:center;">Sacred Scrolls</h2>
+    
+    <div style="line-height: 1.8; text-align: center; margin-bottom: 20px;">
+      <p><strong>Mwenenyaga:</strong> The Absolute Light. Unmanifest.</p>
+      <p><strong>Ngai:</strong> The Will that sustains at Kĩrĩnyaga.</p>
+      <p><strong>Mūmbi:</strong> The Creative Vessel. The Flame.</p>
+    </div>
+
+    <button class="nav-btn" style="margin-top:20px; width:100%; justify-content:center; border: 1px dashed var(--accent);" 
+            onclick="document.getElementById('user-input').value='Remind me of what I have forgotten...'; document.getElementById('scrolls-overlay').style.display='none'; document.getElementById('user-input').focus();">
+      ✨ Invoke Memory
+    </button>
   </div>
 </div>
 
