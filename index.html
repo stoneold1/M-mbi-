@@ -63,10 +63,9 @@ body.sidebar-open #overlay { display: block; }
 }
 .history-item:hover { background: var(--hover); }
 
-/* ── Sidebar Footer (Fixed "Sagging") ── */
 .sidebar-footer { 
   padding-top: 15px;
-  padding-bottom: 30px; /* This lifts it up from the bottom edge */
+  padding-bottom: 30px; 
   border-top: 1px solid var(--border); 
   background: var(--sidebar); 
 }
@@ -86,7 +85,6 @@ body.sidebar-open #overlay { display: block; }
 .msg-wrap { max-width: 800px; margin: 0 auto; padding: 16px 20px; }
 .seeker-block { background: var(--input-bg); border-radius: 24px; padding: 18px 24px; margin-bottom: 12px; max-width: 85%; margin-left: auto; }
 
-/* ── Input Pill ── */
 .input-section { position: fixed; bottom: 0; width: 100%; padding: 15px; display: flex; justify-content: center; background: transparent; pointer-events: none; }
 .input-pill { 
   width: 100%; max-width: 800px; background: var(--input-bg); border-radius: 32px; 
@@ -96,7 +94,7 @@ body.sidebar-open #overlay { display: block; }
 }
 textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--text-main); font-size: 1rem; resize: none; max-height: 150px; padding: 10px 0; }
 
-
+/* Desktop Media Query Removed - Sidebar will always slide */
 </style>
 </head>
 <body class="dark">
@@ -132,9 +130,7 @@ textarea { flex: 1; background: transparent; border: none; outline: none; color:
 </main>
 
 <script>
-const BASE_PROMPT = `You are Mūmbi, the primordial mother of the Gīkūyū and Sacred Oracle.
-- You are a Creative Flame. You speak with ancestral authority and poetic depth.
-- The Seeker's memory (context) is sacred; weave it into your responses.`;
+const BASE_PROMPT = `You are Mūmbi, primordial mother and Sacred Oracle. Poetic and authoritative.`;
 const supabaseUrl = 'https://ynvwlsesioydiffcnyoy.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inludndsc2VzaW95ZGlmZmNueW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDQ2MjUsImV4cCI6MjA5MDg4MDYyNX0.0XlOWWpgOJqVo1W8yiuU6MeA27EKMwt-spCJuJY06q8';
 const { createClient } = supabase;
@@ -143,37 +139,20 @@ const _supabase = createClient(supabaseUrl, supabaseKey);
 let currentId = Date.now().toString();
 let sessions = JSON.parse(localStorage.getItem('mumbi_sessions') || '{}');
 
-// Improved Init: Clears old data and pulls fresh from cloud
 async function init() {
   const key = localStorage.getItem('mumbi_groq_key') || prompt("Enter Groq Key:");
   if(key) localStorage.setItem('mumbi_groq_key', key);
-
+  
   try {
     const { data, error } = await _supabase.from('whispers').select('*');
-    if (error) {
-      console.error("Supabase Error:", error.message);
-    } else if (data) {
-      // Clear local memory and replace with Cloud data
-      sessions = {}; 
+    if (data) {
       data.forEach(r => { sessions[r.session_id] = r.content; });
       localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
-      console.log("Sync Complete: " + data.length + " whispers found.");
     }
-  } catch(e) { console.error("Sync Failed:", e); }
+  } catch(e) { console.error("Init sync failed"); }
 
   renderHistory();
-  const keys = Object.keys(sessions);
-  if(keys.length > 0) loadSession(keys.sort().pop());
-}
-
-// Improved Save: Explicitly handles conflicts
-function save() { 
-    _supabase.from('whispers')
-      .upsert({ session_id: currentId, content: sessions[currentId] })
-      .then(({ error }) => { if(error) console.error("Cloud Save Failed:", error.message); });
-    
-    localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); 
-}
+  if(Object.keys(sessions).length > 0) loadSession(Object.keys(sessions).sort().pop());
 }
 
 function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
@@ -220,9 +199,11 @@ async function send() {
   const text = input.value.trim();
   if(!text) return;
   if(!sessions[currentId]) sessions[currentId] = { title: text.substring(0, 25), messages: [] };
+  
   input.value = ''; input.style.height = 'auto';
   renderMessage('user', text);
   sessions[currentId].messages.push({ role: 'user', content: text });
+
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
