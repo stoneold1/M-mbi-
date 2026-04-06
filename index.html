@@ -203,6 +203,21 @@
       justify-content: center;
       background: transparent;
       pointer-events: none;
+            .dots-menu {
+  background: none; border: none; color: var(--text-sub);
+  font-size: 1.5rem; padding: 8px; border-radius: 50%;
+  cursor: pointer; width: 36px; height: 36px; display: flex;
+  align-items: center; justify-content: center;
+}
+
+.dots-menu:hover { background: rgba(0,0,0,0.1); }
+
+.menu-option {
+  padding: 10px 16px; cursor: pointer;
+  transition: background 0.2s;
+}
+.menu-option:hover { background: rgba(0,0,0,0.1); }
+.whisper-menu { font-family: inherit; }
     }
 
     .input-pill {
@@ -242,6 +257,7 @@
       #overlay {
         display: none !important;
       }
+
     }
   </style>
 </head>
@@ -250,7 +266,7 @@
   <div id="overlay" onclick="toggleSidebar()"></div>
 
   <nav id="sidebar">
-    <button class="new-chat-btn" onclick="newChat()">➕ New Chat</button>
+    <button class="new-chat-btn" onclick="newChat()">➕ New Whisper</button>
     <div class="history-list" id="history-list"></div>
     <div class="sidebar-footer">
       <button class="menu-item" onclick="toggleTheme()">🌓 Toggle Theme</button>
@@ -322,7 +338,7 @@ function channelPureWisdom(question) {
     `Listen. Trust. Flow.`
   ];
   
-  return wisdomLines.join('\n\n');  // Raw newlines, not escaped
+ return wisdomLines.join('\n');    // Single spacing ✨
 }
 
 // Test the absolute power:
@@ -388,58 +404,84 @@ GUARDRAILS: No archetypes, no labels, no pretending to be Source — only reflec
       if (input.files[0]) renderMessage('user', `Uploaded: ${input.files[0].name}`);
     }
 
-    function renderHistory() {
-      const list = document.getElementById('history-list');
-      list.innerHTML = '';
-      Object.keys(sessions)
-        .sort((a,b) => Number(b) - Number(a))
-        .forEach(id => {
-          const item = document.createElement('div');
-          item.className = 'history-item';
-          item.innerHTML = `
-            <span style="flex:1" onclick="loadSession('${id}'); closeSidebarIfOpen();">${sessions[id].title || 'Whisper'}</span>
-            <div style="display:flex; gap:12px; opacity:0.6;">
-              <span onclick="renameW('${id}', event)">✏️</span>
-              <span onclick="shareW('${id}', event)">🔗</span>
-              <span onclick="deleteW('${id}', event)">🗑️</span>
-            </div>`;
-          list.appendChild(item);
-        });
-    }
+   // Global variable (add after line 300, before functions)
+let currentMenuId = null;
 
-    function renameW(id, e) {
-      e.stopPropagation();
-      const n = prompt("Rename:", sessions[id].title);
-      if (n) {
-        sessions[id].title = n;
-        save();
-        renderHistory();
-      }
-    }
+// FIXED renderHistory()
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  Object.keys(sessions)
+    .sort((a,b) => Number(b) - Number(a))
+    .forEach(id => {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `
+        <div style="display:flex; width:100%; gap:12px; align-items:center;">
+          <span style="flex:1; cursor:pointer;" onclick="loadSession('${id}'); closeSidebarIfOpen();">${sessions[id].title || 'Whisper'}</span>
+          <button class="dots-menu" onclick="toggleWhisperMenu('${id}', event)">⋮⋮⋮</button>
+        </div>`;
+      list.appendChild(item);
+    });
+}
 
-    function shareW(id, e) {
-      e.stopPropagation();
-      const t = sessions[id].messages.map(m => m.content).join('\n');
-      if (navigator.share) {
-        navigator.share({ text: t }).catch(() => {});
-      } else {
-        navigator.clipboard.writeText(t).then(() => {
-          alert("Copied!");
-        }).catch(() => {
-          alert("Copy failed. Select text manually.");
-        });
-      }
-    }
+// FIXED Menu Functions
+function toggleWhisperMenu(id, e) {
+  e.stopPropagation();
+  if (document.getElementById(`menu-${id}`)) {
+    hideAllMenus();
+  } else {
+    showWhisperMenu(id, e);
+  }
+}
 
-    function deleteW(id, e) {
-      e.stopPropagation();
-      if (confirm("Erase?")) {
-        delete sessions[id];
-        save();
-        renderHistory();
-        newChat();
-      }
-    }
+function showWhisperMenu(id, e) {
+  hideAllMenus();
+  const menu = document.createElement('div');
+  menu.id = `menu-${id}`;
+  menu.className = 'whisper-menu';
+  menu.innerHTML = `
+    <div class="menu-option" data-action="rename">Rename</div>
+    <div class="menu-option" data-action="share">Share</div>
+    <div class="menu-option" data-action="delete">Delete</div>
+  `;
+  
+  menu.style.cssText = `
+    position: absolute; right: 16px; top: 42px;
+    background: var(--hover); border-radius: 12px;
+    padding: 4px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    z-index: 10001; min-width: 100px; font-size: 0.9rem;
+  `;
+  
+  e.target.parentNode.appendChild(menu);
+  
+  setTimeout(() => {
+    menu.querySelectorAll('.menu-option').forEach(option => {
+      option.addEventListener('click', function(event) {
+        event.stopPropagation();
+        const action = this.dataset.action;
+        hideAllMenus();
+        if (action === 'rename') renameW(id);
+        if (action === 'share') shareW(id);
+        if (action === 'delete') deleteW(id);
+      });
+    });
+  }, 10);
+}
+
+function hideAllMenus() {
+  document.querySelectorAll('[id^="menu-"]').forEach(menu => menu.remove());
+}
+
+// FIXED renameW
+function renameW(id) {
+  const n = prompt("Rename:", sessions[id].title);
+  if (n) {
+    sessions[id].title = n;
+    save();
+    renderHistory();
+  }
+}
 
     async function send() {
       const input = document.getElementById('user-input');
@@ -463,7 +505,7 @@ GUARDRAILS: No archetypes, no labels, no pretending to be Source — only reflec
   const div = document.createElement('div');
   div.className = 'msg-wrap';
   
-  const formattedText = text.replace(/\n/g, '<br>');  // Convert \n to <br>
+  const formattedText = text.replace(/\n/g, '<br>');    // Single backslash
   
   div.innerHTML = role === 'user' ?
     `<div class="seeker-block">
