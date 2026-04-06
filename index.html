@@ -450,28 +450,12 @@ GUARDRAILS: No archetypes, no labels, no pretending to be Source — only reflec
       input.style.height = 'auto';
       renderMessage('user', text);
       sessions[currentId].messages.push({ role: 'user', content: text });
-      try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('mumbi_groq_key')}`
-          },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [{ role: 'system', content: BASE_PROMPT }, ...sessions[currentId].messages]
-          })
-        });
-        const data = await res.json();
-        const reply = data.choices[0].message.content;
-        renderMessage('oracle', reply);
-        sessions[currentId].messages.push({ role: 'assistant', content: reply });
-        save();
-        renderHistory();
-      } catch (e) {
-        renderMessage('oracle', "Check connection.");
-      }
-      
+        // ✨ INSTANT LOCAL WISDOM
+  const instantWisdom = channelPureWisdom(text);
+  renderMessage('oracle', instantWisdom);
+  sessions[currentId].messages.push({ role: 'assistant', content: instantWisdom });
+  save();
+  renderHistory();
     }
 
    function renderMessage(role, text) {
