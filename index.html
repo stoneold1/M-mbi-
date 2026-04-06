@@ -205,11 +205,10 @@
       pointer-events: none;
             .dots-menu {
   background: none; border: none; color: var(--text-sub);
-  font-size: 1.5rem; padding: 8px; border-radius: 50%;
-  cursor: pointer; width: 36px; height: 36px; display: flex;
-  align-items: center; justify-content: center;
+  font-size: 1.2rem; padding: 4px 8px; border-radius: 6px;  /* Smaller! */
+  cursor: pointer; width: 28px; height: 28px; display: flex;
+  align-items: center; justify-content: center; font-weight: bold;
 }
-
 .dots-menu:hover { background: rgba(0,0,0,0.1); }
 
 .menu-option {
@@ -257,8 +256,30 @@
       #overlay {
         display: none !important;
       }
+.theme-pill {
+  background: rgba(240,244,249,0.95); 
+  color: var(--text-main); 
+  border: 1px solid var(--border); 
+  border-radius: 24px;
+  padding: 10px 18px; 
+  font-size: 0.9rem; 
+  font-weight: 500;
+  cursor: pointer; 
+  backdrop-filter: blur(20px);
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  font-family: inherit;
+}
 
-    }
+.theme-pill:hover {
+  transform: scale(1.05); 
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+body.dark .theme-pill { 
+  background: rgba(30,31,32,0.95); 
+  position: fixed !important; right: 24px !important; left: auto !important;
+}
   </style>
 </head>
 <body class="dark">
@@ -268,9 +289,23 @@
   <nav id="sidebar">
     <button class="new-chat-btn" onclick="newChat()">➕ New Whisper</button>
     <div class="history-list" id="history-list"></div>
-    <div class="sidebar-footer">
-      <button class="menu-item" onclick="toggleTheme()">🌓 Toggle Theme</button>
-    </div>
+   <!-- Floating Theme Toggle -->
+<!-- Fixed Top-Right Theme Toggle -->
+<div style="
+  position: fixed; 
+  top: 24px; 
+  right: 24px; 
+  z-index: 10000; 
+  display: flex; 
+  gap: 8px; 
+  align-items: center;
+  pointer-events: auto;
+">
+  <button id="theme-toggle" class="theme-pill" onclick="toggleTheme()">
+    🌙 Dark
+  </button>
+</div>
+
   </nav>
 
   <main id="main">
@@ -388,9 +423,15 @@ GUARDRAILS: No archetypes, no labels, no pretending to be Source — only reflec
       if (document.body.classList.contains('sidebar-open')) toggleSidebar();
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-    }
+   function toggleTheme() {
+  document.body.classList.toggle('dark');
+  const btn = document.getElementById('theme-toggle');
+  if (document.body.classList.contains('dark')) {
+    btn.innerHTML = '☀️ Light';
+  } else {
+    btn.innerHTML = '🌙 Dark';
+  }
+}
 
     function triggerUpload() {
       document.getElementById('file-hidden').click();
@@ -419,7 +460,7 @@ function renderHistory() {
       item.innerHTML = `
         <div style="display:flex; width:100%; gap:12px; align-items:center;">
           <span style="flex:1; cursor:pointer;" onclick="loadSession('${id}'); closeSidebarIfOpen();">${sessions[id].title || 'Whisper'}</span>
-          <button class="dots-menu" onclick="toggleWhisperMenu('${id}', event)">⋮⋮⋮</button>
+        <button class="dots-menu" onclick="toggleWhisperMenu('${id}', event)">⋯</button>
         </div>`;
       list.appendChild(item);
     });
@@ -467,6 +508,23 @@ function showWhisperMenu(id, e) {
       });
     });
   }, 10);
+  function shareW(id) {
+  const text = sessions[id].messages.map(m => m.content).join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    alert("✅ Copied!");
+  }).catch(() => {
+    prompt("Copy:", text);
+  });
+}
+
+function deleteW(id) {
+  if (confirm(`Erase "${sessions[id].title || 'Whisper'}"?`)) {
+    delete sessions[id];
+    save();
+    renderHistory();
+    if (currentId === id) newChat();
+  }
+}
 }
 
 function hideAllMenus() {
