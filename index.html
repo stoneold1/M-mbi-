@@ -334,7 +334,7 @@
       .input-section {
         padding: 20px 40px;
       }
-   .history-title {
+.history-title {
   flex: 1;
   cursor: pointer;
   font-weight: 500;
@@ -347,32 +347,30 @@
 
 .history-title::after {
   content: attr(data-full-title);
-  position: absolute;
-  left: 50%;
-  top: 100%;
-  transform: translateX(-50%) translateY(4px);
+  position: fixed; /* Changed to fixed - no parent overlap */
   background: var(--sidebar);
   color: var(--text-main);
-  padding: 10px 14px;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
   white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
   border: 1px solid var(--border);
   opacity: 0;
   visibility: hidden;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 10001;
+  z-index: 10002;
   font-size: 0.9rem;
-  max-width: 280px;
+  max-width: 300px;
   pointer-events: none;
-  margin-top: 8px;
+  font-weight: 500;
 }
 
 .history-title:hover::after {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(8px);
 }
+
+/* Dynamic positioning via JS */
 
 body.dark .history-title::after {
   background: var(--sidebar);
@@ -618,11 +616,61 @@ GUARDRAILS: No archetypes, no labels, no pretending to be Source — only reflec
       item.className = 'history-item';
       item.innerHTML = `
         <div style="display:flex; width:100%; gap:12px; align-items:center;">
-          <span class="history-title" data-full-title="${title}" onclick="loadSession('${id}'); closeSidebarIfOpen();">${shortTitle}</span>
+          <span class="history-title" data-full-title="${title}" data-id="${id}" onclick="loadSession('${id}'); closeSidebarIfOpen();">${shortTitle}</span>
           <button class="dots-menu" onclick="toggleWhisperMenu('${id}', event)" title="Menu">⋯</button>
         </div>`;
       list.appendChild(item);
     });
+  
+  // Add tooltip listeners
+  document.querySelectorAll('.history-title').forEach(title => {
+    title.onmouseenter = () => showTooltip(title);
+    title.onmouseleave = () => hideTooltip();
+  });
+}
+let currentTooltip = null;
+
+function showTooltip(titleEl) {
+  if (currentTooltip) currentTooltip.remove();
+  
+  const rect = titleEl.getBoundingClientRect();
+  const fullText = titleEl.dataset.fullTitle;
+  const sidebarRect = document.getElementById('sidebar').getBoundingClientRect();
+  
+  currentTooltip = document.createElement('div');
+  currentTooltip.className = 'history-title';
+  currentTooltip.textContent = fullText;
+  currentTooltip.style.cssText = `
+    position: fixed;
+    left: ${Math.max(sidebarRect.left + 8, rect.left)}px;
+    top: ${rect.bottom + 8}px;
+    background: var(--sidebar);
+    color: var(--text-main);
+    padding: 12px 16px;
+    border-radius: 12px;
+    white-space: nowrap;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    z-index: 10002;
+    font-size: 0.9rem;
+    font-weight: 500;
+    pointer-events: none;
+  `;
+  
+  // Check if it fits below, if not put above
+  const tooltipRect = currentTooltip.getBoundingClientRect();
+  if (tooltipRect.bottom > window.innerHeight - 20) {
+    currentTooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+  }
+  
+  document.body.appendChild(currentTooltip);
+}
+
+function hideTooltip() {
+  if (currentTooltip) {
+    currentTooltip.remove();
+    currentTooltip = null;
+  }
 }
 
     function showToast(message) {
