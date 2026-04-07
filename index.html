@@ -334,6 +334,56 @@
       .input-section {
         padding: 20px 40px;
       }
+   .history-title {
+  flex: 1;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  z-index: 10;
+}
+
+.history-title::after {
+  content: attr(data-full-title);
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--sidebar);
+  color: var(--text-main);
+  padding: 10px 14px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10001;
+  font-size: 0.9rem;
+  max-width: 280px;
+  pointer-events: none;
+  margin-top: 8px;
+}
+
+.history-title:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(8px);
+}
+
+body.dark .history-title::after {
+  background: var(--sidebar);
+  color: var(--text-main);
+}
+
+/* Ensure sidebar items have space for tooltip */
+.history-item {
+  position: relative;
+  margin-bottom: 12px !important;
+}
     }
   </style>
 </head>
@@ -556,21 +606,24 @@ GUARDRAILS: No archetypes, no labels, no pretending to be Source — only reflec
     }
 
     function renderHistory() {
-      const list = document.getElementById('history-list');
-      list.innerHTML = '';
-      Object.keys(sessions)
-        .sort((a,b) => Number(b) - Number(a))
-        .forEach(id => {
-          const item = document.createElement('div');
-          item.className = 'history-item';
-          item.innerHTML = `
-            <div style="display:flex; width:100%; gap:12px; align-items:center;">
-              <span style="flex:1; cursor:pointer; font-weight:500;" onclick="loadSession('${id}'); closeSidebarIfOpen();">${sessions[id].title || 'Untitled Whisper'}</span>
-              <button class="dots-menu" onclick="toggleWhisperMenu('${id}', event)" title="Menu">⋯</button>
-            </div>`;
-          list.appendChild(item);
-        });
-    }
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  Object.keys(sessions)
+    .sort((a,b) => Number(b) - Number(a))
+    .forEach(id => {
+      const title = sessions[id].title || 'Untitled Whisper';
+      const shortTitle = title.length > 25 ? title.substring(0, 25) + '...' : title;
+      
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `
+        <div style="display:flex; width:100%; gap:12px; align-items:center;">
+          <span class="history-title" data-full-title="${title}" onclick="loadSession('${id}'); closeSidebarIfOpen();">${shortTitle}</span>
+          <button class="dots-menu" onclick="toggleWhisperMenu('${id}', event)" title="Menu">⋯</button>
+        </div>`;
+      list.appendChild(item);
+    });
+}
 
     function showToast(message) {
       const toast = document.createElement('div');
