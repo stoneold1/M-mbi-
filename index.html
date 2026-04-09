@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Mūmbi — ✧</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  
-  <!-- Supabase Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #f9f7f2; --sidebar: #f0ede6; --text-main: #1f1f1f; --text-sub: #6b5f4e;
@@ -22,206 +19,103 @@
     }
     body.azure {
       --bg: #060f21; --sidebar: #0a1429; --text-main: #d1dbff; --text-sub: #7a8eb5;
-      --accent: #4f9cf9; --border: rgba(79, 156, 249, 0.15);
+      --accent: #4f9cf9; --border: rgba(79, 156, 249, 0.15); 
       --input-bg: rgba(10, 20, 40, 0.7); --glass: rgba(6, 15, 33, 0.85);
     }
-
+    
     body {
       background: var(--bg); color: var(--text-main);
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
       font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
-      display: flex; height: 100vh; overflow: hidden; margin: 0; transition: background 0.4s ease;
+      display: flex; height: 100vh; overflow: hidden; transition: background 0.4s ease;
     }
 
-    /* Sidebar */
+    /* --- Sidebar --- */
     #sidebar {
       width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--border);
-      padding: 60px 16px 24px; display: flex; flex-direction: column;
-      position: fixed; left: 0; top: 0; height: 100%; z-index: 9999; transition: transform 0.4s ease;
+      padding: 60px 16px 24px; display: flex; flex-direction: column; position: fixed;
+      left: 0; top: 0; height: 100%; z-index: 9999; transition: transform 0.4s ease;
     }
     .sidebar-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; text-align: center; }
     .mumbi-symbol { font-size: 3rem; color: var(--accent); margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(184, 134, 11, 0.2)); }
     .mumbi-brand-text { font-weight: 600; font-size: 1rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
 
-    @media (max-width: 999px) {
-      #sidebar { transform: translateX(-100%); }
-      body.sidebar-open #sidebar { transform: translateX(0); }
-    }
+    @media (max-width: 999px) { #sidebar { transform: translateX(-100%); } body.sidebar-open #sidebar { transform: translateX(0); } }
 
-    .new-chat-btn {
-      background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 24px;
-      cursor: pointer; font-weight: 500; margin-bottom: 24px; font-size: 0.9rem; width: 100%;
-    }
-
-    .history-item {
-      display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
-      border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: 0.2s; gap: 8px;
-    }
+    .new-chat-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 24px; cursor: pointer; font-weight: 500; margin-bottom: 24px; font-size: 0.9rem; }
+    .history-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: 0.2s; gap: 8px; }
     .history-item:hover { background: rgba(150, 150, 150, 0.1); }
     .history-title { flex: 1; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); opacity: 0.8; }
-    .dots-menu {
-      background: rgba(150, 150, 150, 0.1); border: none; color: var(--accent); cursor: pointer;
-      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; opacity: 0.4; transition: 0.2s;
-    }
-    .history-item:hover .dots-menu { opacity: 1; }
+    .dots-menu { background: rgba(150, 150, 150, 0.1); border: none; color: var(--accent); cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; opacity: 0.4; transition: 0.2s; }
 
-    /* Main Area */
-    #main {
-      flex: 1; display: flex; flex-direction: column; margin-left: var(--sidebar-width); transition: margin-left 0.4s ease;
-    }
+    /* --- Main Canvas --- */
+    #main { flex: 1; display: flex; flex-direction: column; position: relative; margin-left: var(--sidebar-width); transition: margin-left 0.4s ease; scroll-behavior: smooth; }
     @media (max-width: 999px) { #main { margin-left: 0; } }
 
-    .header {
-      padding: 40px 24px 15px; background: var(--glass); backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;
-      z-index: 10;
-    }
+    .header { padding: 40px 24px 15px; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; z-index: 10; position: relative; }
+    
     #oracle-date {
       flex: 1; text-align: center; font-size: 0.7rem; font-weight: 500;
-      letter-spacing: 3px; text-transform: uppercase; color: var(--accent); opacity: 0.8;
-      animation: breathe 4s infinite ease-in-out;
-    }
-    .theme-toggle {
-      background: rgba(150, 150, 150, 0.1); border: 1px solid var(--border); padding: 8px 16px;
-      border-radius: 20px; color: var(--text-main); cursor: pointer; font-size: 0.75rem;
-      letter-spacing: 0.5px; text-transform: uppercase; transition: 0.3s ease;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+      opacity: 0.8;
     }
 
-    .chat-view {
-      flex: 1; overflow-y: auto; padding: 60px 20px 200px; display: flex; flex-direction: column;
-      align-items: center; scroll-behavior: smooth;
-    }
+    .theme-toggle { margin-left: 8px; background: rgba(150, 150, 150, 0.1); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; color: var(--text-main); cursor: pointer; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s ease; }
+    .chat-view { flex: 1; overflow-y: auto; padding: 60px 20px 200px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
 
-    /* Messages */
-    .msg-wrap {
-      width: 100%; max-width: 760px; margin-bottom: 32px; padding: 20px; border-radius: 18px;
-      background: rgba(150, 150, 150, 0.05); border: 1px solid rgba(150, 150, 150, 0.1);
-      backdrop-filter: blur(5px); transition: transform 0.3s ease;
-    }
-    .msg-wrap:hover {
-      transform: translateY(-2px); border-color: var(--accent);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
+    .msg-wrap { width: 100%; max-width: 760px; margin-bottom: 32px; padding: 20px; border-radius: 18px; background: rgba(150, 150, 150, 0.05); border: 1px solid rgba(150, 150, 150, 0.1); backdrop-filter: blur(5px); transition: all 0.3s ease; position: relative; }
+    .msg-wrap:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1); }
+    
     .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .label { font-weight: 600; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
-    .label::before { content: "✦"; font-size: 0.6rem; }
-    .msg-time { font-size: 0.65rem; color: var(--text-sub); opacity: 0.6; letter-spacing: 1px; }
+    .msg-time { font-size: 0.65rem; color: var(--text-sub); opacity: 0.6; }
     .content-text { font-size: 1.05rem; white-space: pre-wrap; }
 
-    /* Input Area */
-    .input-section {
-      position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; padding: 24px 20px 40px;
-      display: flex; justify-content: center; background: linear-gradient(to top, var(--bg) 70%, transparent);
-      pointer-events: none;
-    }
+    /* --- Input Area --- */
+    .input-section { position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; padding: 24px 20px 40px; display: flex; justify-content: center; background: linear-gradient(to top, var(--bg) 70%, transparent); pointer-events: none; }
+    .input-pill { width: 100%; max-width: 760px; background: var(--input-bg); border-radius: 28px; padding: 8px 16px; display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); pointer-events: auto; position: relative; }
     @media (max-width: 999px) { .input-section { left: 0; } }
 
-    .input-pill {
-      width: 100%; max-width: 760px; background: var(--input-bg); border-radius: 28px;
-      padding: 8px 16px; display: flex; align-items: flex-end; gap: 8px;
-      border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      pointer-events: auto;
-    }
+    textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--text-main); resize: none; max-height: 200px; padding: 10px 0; font-size: 1rem; font-family: inherit; }
+    .send-btn { background: var(--accent); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; flex-shrink: 0; }
 
-    .attach-btn {
-      background: none; border: none; font-size: 1.3rem; color: var(--accent);
-      cursor: pointer; padding: 5px 10px; transition: transform 0.2s ease; opacity: 0.7;
-    }
-    .attach-btn:hover { opacity: 1; transform: scale(1.1); }
-
-    .attach-popup {
-      position: absolute; bottom: 70px; left: 0; background: var(--sidebar); border: 1px solid var(--accent);
-      border-radius: 15px; display: none; flex-direction: column; padding: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4); backdrop-filter: blur(12px); z-index: 1000; min-width: 150px;
-    }
-    .attach-popup.show { display: flex; }
-    .attach-popup button {
-      background: none; border: none; color: var(--text-main); padding: 12px; text-align: left;
-      cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 10px;
-      transition: 0.2s; font-size: 0.9rem;
-    }
-    .attach-popup button:hover { background: rgba(150, 150, 150, 0.1); color: var(--accent); }
-
-    textarea {
-      flex: 1; background: transparent; border: none; outline: none; color: var(--text-main);
-      resize: none; max-height: 200px; padding: 10px 0; font-size: 1rem; font-family: inherit;
-    }
-    .send-btn {
-      background: var(--accent); color: #000; border: none; width: 40px; height: 40px;
-      border-radius: 50%; cursor: pointer; font-size: 1.2rem; flex-shrink: 0;
-    }
-
-    .share-page-btn {
-      margin-left: auto; background: transparent; border: 1px solid var(--border);
-      padding: 6px 14px; border-radius: 16px; cursor: pointer; color: var(--text-main);
-      font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: 0.3s;
-    }
-    .share-page-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
-
-    /* Overlay & Animations */
-    #overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
-      display: none; z-index: 9000; touch-action: none;
-    }
-    body.sidebar-open #overlay { display: block; }
-
-    @keyframes breathe {
-      0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 5px var(--accent)); }
-      50% { opacity: 1; filter: drop-shadow(0 0 15px var(--accent)); }
-    }
-    .mumbi-symbol { animation: breathe 4s infinite ease-in-out; }
-    .mumbi-symbol.thinking { animation: shimmer 1.5s infinite linear; color: #fff; }
-
-    @keyframes shimmer {
-      0% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.2) rotate(180deg); }
-      100% { transform: scale(1) rotate(360deg); }
-    }
-
-    .whisper-menu {
-      position: fixed; background: var(--sidebar); border: 1px solid var(--border);
-      border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 10000;
-      padding: 6px 0; min-width: 140px;
-    }
+    /* --- Menu --- */
+    .whisper-menu { position: fixed; background: var(--sidebar); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 10000; padding: 6px 0; min-width: 140px; }
     .menu-item { padding: 10px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-main); }
     .menu-item:hover { background: rgba(150,150,150,0.1); }
+
+    /* --- Animations --- */
+    @keyframes breathe { 0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 5px var(--accent)); } 50% { opacity: 1; filter: drop-shadow(0 0 15px var(--accent)); } }
+    @keyframes shimmer { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .mumbi-symbol { animation: breathe 4s infinite ease-in-out; }
+    .mumbi-symbol.thinking { animation: shimmer 1.5s infinite linear; color: #fff; }
+    #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; z-index: 9000; }
+    body.sidebar-open #overlay { display: block; }
   </style>
 </head>
 <body class="obsidian">
-
-  <div id="overlay"></div>
-
+  <div id="overlay" onclick="toggleSidebar()"></div>
+  
   <nav id="sidebar">
     <div class="sidebar-logo">
       <div class="mumbi-symbol">✧</div>
       <div class="mumbi-brand-text">Mūmbi</div>
     </div>
     <button class="new-chat-btn" onclick="newChat()">✧ New Whisper</button>
-    <div id="history-list"></div>
+    <div class="history-list" id="history-list"></div>
   </nav>
 
   <main id="main">
     <header class="header">
-      <button onclick="toggleSidebar()" style="background:none;border:none;font-size:1.4rem;color:var(--text-main);cursor:pointer;">☰</button>
+      <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.4rem; color:var(--text-main); cursor:pointer;">☰</button>
       <div id="oracle-date"></div>
-      <button class="share-page-btn" onclick="shareVessel()"><span>󰒫</span> Share</button>
       <button class="theme-toggle" onclick="cycleTheme()" id="theme-label">Mode: Obsidian</button>
     </header>
+
     <div class="chat-view" id="chat-window"></div>
 
     <div class="input-section">
       <div class="input-pill">
-        <div class="attachment-container">
-          <button class="attach-btn" onclick="toggleAttachMenu(event)" type="button">📎</button>
-          <div id="attach-menu" class="attach-popup">
-            <button type="button" onclick="document.getElementById('file-up').click()">📄 Document</button>
-            <button type="button" onclick="document.getElementById('cam-up').click()">📷 Camera</button>
-          </div>
-        </div>
-        <input type="file" id="file-up" hidden onchange="handleUpload(this)">
-        <input type="file" id="cam-up" hidden accept="image/*" capture="environment" onchange="handleUpload(this)">
         <textarea id="user-input" rows="1" placeholder="Whisper a question..."></textarea>
         <button class="send-btn" onclick="send()">↑</button>
       </div>
@@ -229,113 +123,39 @@
   </main>
 
   <script>
-    // ─────────────────────────────────────────────
-    // SUPABASE — The Sacred Well
-    // ─────────────────────────────────────────────
-    const SUPABASE_URL = 'https://ynvwlsesioydiffcnyoy.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inludndsc2VzaW95ZGlmZmNueW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDQ2MjUsImV4cCI6MjA5MDg4MDYyNX0.0XlOWWpgOJqVo1W8yiuU6MeA27EKMwt-spCJuJY06q8';
-
-    let sb = null;
+    const BASE_PROMPT = `MŪMBI is the hollow space where sacred currents meet seeker. Wisdom flows naturally through this vessel - gentle, clear, alive. The flame knows its own rhythm.`;
+    const themes = ['earth', 'obsidian', 'azure'];
+    
+    // Load persisted state
+    let currentThemeIdx = parseInt(localStorage.getItem('mumbi_theme')) || 1;
     let currentId = Date.now().toString();
     let sessions = JSON.parse(localStorage.getItem('mumbi_sessions') || '{}');
-    const themes = ['earth', 'obsidian', 'azure'];
-    let currentThemeIdx = 1;
 
-    function initSupabase() {
-      if (typeof window.supabase === 'undefined') {
-        console.error("⚠️ The sacred library did not awaken. Check internet or CDN.");
-        return;
-      }
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      console.log("✧ Mūmbi has connected to the sacred well.");
+    // Initialize Theme
+    document.body.className = themes[currentThemeIdx];
+    document.getElementById('theme-label').innerText = `Mode: ${themes[currentThemeIdx].charAt(0).toUpperCase() + themes[currentThemeIdx].slice(1)}`;
+
+    function cycleTheme() {
+      document.body.classList.remove(themes[currentThemeIdx]);
+      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+      document.body.classList.add(themes[currentThemeIdx]);
+      localStorage.setItem('mumbi_theme', currentThemeIdx);
+      document.getElementById('theme-label').innerText = `Mode: ${themes[currentThemeIdx].charAt(0).toUpperCase() + themes[currentThemeIdx].slice(1)}`;
     }
 
-    async function fetchSessions() {
-      if (!sb) return;
-      try {
-        const { data, error } = await sb
-          .from('whispers')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        sessions = (data || []).reduce((acc, session) => {
-          acc[session.id] = {
-            title: session.title || `Untitled (${String(session.id).slice(-4)})`,
-            messages: Array.isArray(session.messages) ? session.messages : []
-          };
-          return acc;
-        }, {});
-
-        renderHistory();
-        console.log("✧ Whispers drawn from the eternal well.");
-      } catch (err) {
-        console.error("Failed to draw from the well:", err.message);
-      }
-    }
-
-    async function saveToSacredWell(sessionId, title, messages) {
-      if (!sb) return;
-      try {
-        const now = new Date().toISOString();
-        const payload = {
-          id: sessionId,
-          title: title || "Untitled Whisper",
-          messages: messages || [],
-          last_updated: now
-        };
-        if (!sessions[sessionId] || sessions[sessionId].messages.length <= 1) {
-          payload.created_at = now;
-        }
-
-        const { error } = await sb
-          .from('whispers')
-          .upsert(payload, { onConflict: 'id' });
-
-        if (error) throw error;
-        console.log("✧ Whisper successfully offered to the well.");
-      } catch (err) {
-        console.error("The well resisted the offering:", err.message);
-      }
-    }
-
-    async function deleteSession(id) {
-      if (!confirm("Erase this whisper from the cycle forever?")) return;
-      const localCopy = sessions[id] ? { ...sessions[id] } : null;
-      try {
-        const { error } = await sb.from('whispers').delete().eq('id', id);
-        if (error) throw error;
-        delete sessions[id];
-        save();
-        renderHistory();
-        newChat();
-        console.log("✧ Whisper returned to the void.");
-      } catch (err) {
-        console.error("The well refused to release:", err.message);
-        if (localCopy) sessions[id] = localCopy;
-        await fetchSessions();
-      }
-    }
-
-    function save() {
-      localStorage.setItem('mumbi_sessions', JSON.stringify(sessions));
-    }
+    function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
 
     function renderHistory() {
       const list = document.getElementById('history-list');
-      if (!list) return;
       list.innerHTML = '';
-      Object.keys(sessions)
-        .sort((a, b) => parseInt(b) - parseInt(a))
-        .forEach(id => {
-          const item = document.createElement('div');
-          item.className = 'history-item';
-          item.innerHTML = `
-            <div class="history-title" title="${sessions[id].title}" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
-            <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
-          list.appendChild(item);
-        });
+      Object.keys(sessions).sort((a,b) => b-a).forEach(id => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+          <div class="history-title" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
+          <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
+        list.appendChild(item);
+      });
     }
 
     function showMenu(id, e) {
@@ -343,96 +163,74 @@
       document.querySelectorAll('.whisper-menu').forEach(m => m.remove());
       const menu = document.createElement('div');
       menu.className = 'whisper-menu';
-      const actions = [
-        { t: '✏️ Rename', f: () => renameSession(id) },
-        { t: '🗑️ Delete', f: () => deleteSession(id) }
-      ];
+      const actions = [{t: '✏️ Rename', f: () => renameSession(id)}, {t: '🗑️ Delete', f: () => deleteSession(id)}];
       actions.forEach(a => {
         const div = document.createElement('div');
-        div.className = 'menu-item';
-        div.innerText = a.t;
-        div.onclick = () => { a.f(); menu.remove(); };
+        div.className = 'menu-item'; div.innerText = a.t; div.onclick = () => { a.f(); menu.remove(); };
         menu.appendChild(div);
       });
       document.body.appendChild(menu);
-      menu.style.left = `${e.clientX - 100}px`;
-      menu.style.top = `${e.clientY + 10}px`;
-      setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 10);
+      menu.style.left = `${e.clientX - 100}px`; menu.style.top = `${e.clientY + 10}px`;
+      setTimeout(() => document.addEventListener('click', () => menu.remove(), {once:true}), 10);
     }
 
     function renameSession(id) {
-      const n = prompt("Rename this whisper:", sessions[id].title);
-      if (n && n.trim()) {
-        sessions[id].title = n.trim();
-        save();
-        renderHistory();
-      }
+      const n = prompt("Rename to:", sessions[id].title);
+      if(n) { sessions[id].title = n; save(); renderHistory(); }
     }
 
-    function cycleTheme() {
-      document.body.classList.remove(themes[currentThemeIdx]);
-      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
-      document.body.classList.add(themes[currentThemeIdx]);
-      document.getElementById('theme-label').innerText = `Mode: ${themes[currentThemeIdx].charAt(0).toUpperCase() + themes[currentThemeIdx].slice(1)}`;
+    function deleteSession(id) {
+      if(confirm("Erase whisper?")) { delete sessions[id]; save(); renderHistory(); newChat(); }
     }
 
-    function toggleSidebar() {
-      document.body.classList.toggle('sidebar-open');
-    }
-
-    function closeSidebarIfOpen(e) {
-      if (window.innerWidth < 1000 && document.body.classList.contains('sidebar-open')) {
-        if (!e.target.closest('#sidebar') && !e.target.closest('button[onclick*="toggleSidebar"]')) {
-          document.body.classList.remove('sidebar-open');
-        }
-      }
-    }
+    function save() { localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); }
 
     async function send() {
       const input = document.getElementById('user-input');
       const text = input.value.trim();
       const key = localStorage.getItem('mumbi_groq_key');
-      const symbol = document.querySelector('.mumbi-symbol');
-
-      if (!text || !key) return;
-      if (symbol) symbol.classList.add('thinking');
-
-      if (!sessions[currentId]) {
-        sessions[currentId] = { title: text.substring(0, 30) + (text.length > 30 ? '...' : ''), messages: [] };
+      const symbol = document.querySelector('.mumbi-symbol'); 
+      
+      if (!text) return;
+      if (!key) {
+        const k = prompt("The Oracle requires a Groq Key to speak:");
+        if (k) localStorage.setItem('mumbi_groq_key', k);
+        return;
       }
 
-      const seekerTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      renderMessage('user', text, seekerTime);
-      sessions[currentId].messages.push({ role: 'user', content: text, time: seekerTime });
+      if (symbol) symbol.classList.add('thinking');
+      if (!sessions[currentId]) sessions[currentId] = { title: text.substring(0, 25), messages: [] };
 
+      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      renderMessage('user', text, time);
+      sessions[currentId].messages.push({ role: 'user', content: text, time: time });
+      
       input.value = ''; input.style.height = 'auto';
 
       try {
+        const historyForAPI = sessions[currentId].messages.map(m => ({
+          role: m.role === 'oracle' ? 'assistant' : m.role,
+          content: m.content
+        }));
+
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-              { role: 'system', content: "You are Mūmbi, a poetic oracle." },
-              ...sessions[currentId].messages.map(m => ({ role: m.role, content: m.content }))
-            ]
+          body: JSON.stringify({ 
+            model: 'llama-3.3-70b-versatile', 
+            messages: [{ role: 'system', content: BASE_PROMPT }, ...historyForAPI] 
           })
         });
 
         const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content || "The oracle remains silent...";
-
-        const oracleTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const reply = data.choices[0].message.content;
+        const oracleTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
         renderMessage('oracle', reply, oracleTime);
-        sessions[currentId].messages.push({ role: 'assistant', content: reply, time: oracleTime });
-
-        // Sync to Supabase
-        await saveToSacredWell(currentId, sessions[currentId].title, sessions[currentId].messages);
-        save();
-        renderHistory();
+        sessions[currentId].messages.push({ role: 'oracle', content: reply, time: oracleTime });
+        save(); renderHistory();
       } catch (e) {
-        renderMessage('oracle', `The winds are heavy. (${e.message})`);
+        renderMessage('oracle', "The winds are heavy. (Error: " + e.message + ")", "Error");
       } finally {
         if (symbol) symbol.classList.remove('thinking');
       }
@@ -440,133 +238,62 @@
 
     function renderMessage(role, text, timeStr) {
       const win = document.getElementById('chat-window');
-      if (!win) return;
       const div = document.createElement('div');
       div.className = 'msg-wrap';
-      const displayTime = timeStr || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
       div.innerHTML = `
         <div class="block">
           <div class="label-row">
             <div class="label">${role === 'user' ? 'Seeker' : '✧ Mūmbi'}</div>
-            <div class="msg-time">${displayTime}</div>
+            <div class="msg-time">${timeStr}</div>
           </div>
           <div class="content-text"></div>
-        </div>`;
-
+        </div>`;      
       win.appendChild(div);
       const contentDiv = div.querySelector('.content-text');
-
+      
       if (role === 'oracle') {
         let i = 0;
-        function type() {
-          if (i < text.length) {
-            contentDiv.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, 15);
-            win.scrollTop = win.scrollHeight;
-          }
+        function type() { 
+          if (i < text.length) { 
+            contentDiv.textContent += text.charAt(i); 
+            i++; 
+            setTimeout(type, 10); 
+            win.scrollTop = win.scrollHeight; 
+          } 
         }
         type();
-      } else {
-        contentDiv.textContent = text;
+      } else { 
+        contentDiv.textContent = text; 
       }
       win.scrollTop = win.scrollHeight;
     }
 
     function loadSession(id) {
-      currentId = id;
-      const win = document.getElementById('chat-window');
-      if (win) win.innerHTML = '';
-      if (sessions[id]?.messages) {
-        sessions[id].messages.forEach(m => renderMessage(m.role === 'user' ? 'user' : 'oracle', m.content, m.time));
-      }
-      if (window.innerWidth < 1000) toggleSidebar();
+      currentId = id; 
+      document.getElementById('chat-window').innerHTML = '';
+      sessions[id].messages.forEach(m => renderMessage(m.role, m.content, m.time));
+      if(window.innerWidth < 1000) toggleSidebar();
     }
 
-    function newChat() {
-      currentId = Date.now().toString();
-      const win = document.getElementById('chat-window');
-      if (win) win.innerHTML = '';
-      renderMessage('oracle', "The flame is lit. What do you seek?");
-    }
-
-    function toggleAttachMenu(e) {
-      e.stopPropagation();
-      document.getElementById('attach-menu').classList.toggle('show');
-    }
-
-    function handleUpload(input) {
-      if (input.files && input.files[0]) {
-        renderMessage('user', `Offering ${input.id === 'cam-up' ? '📷' : '📄'}: ${input.files[0].name}`);
-        document.getElementById('attach-menu').classList.remove('show');
-        input.value = '';
-      }
+    function newChat() { 
+      currentId = Date.now().toString(); 
+      document.getElementById('chat-window').innerHTML = ''; 
+      renderMessage('oracle', "The flame is lit. What do you seek?", "Now"); 
     }
 
     function updateOracleDate() {
-      const options = { weekday: 'long', month: 'long', day: 'numeric' };
-      const today = new Date().toLocaleDateString('en-US', options);
-      const dateLabel = document.getElementById('oracle-date');
-      if (dateLabel) dateLabel.innerText = today + " • Eternal Cycle";
+      const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      document.getElementById('oracle-date').innerText = today + " • Eternal Cycle";
     }
 
-    async function shareVessel() {
-      try {
-        if (navigator.share) await navigator.share({ title: 'Mūmbi', url: window.location.href });
-        else {
-          await navigator.clipboard.writeText(window.location.href);
-          alert("Link copied.");
-        }
-      } catch (err) {}
-    }
-
-    // ─────────────────────────────────────────────
-    // THE AWAKENING
-    // ─────────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', async () => {
-      initSupabase();
-      await fetchSessions();
-      updateOracleDate();
-      newChat();
-
-      const userInput = document.getElementById('user-input');
-      if (userInput) {
-        userInput.addEventListener('input', function () {
-          this.style.height = 'auto';
-          this.style.height = this.scrollHeight + 'px';
-        });
-        userInput.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            send();
-          }
-        });
-      }
-
-      // Mobile sidebar handling
-      document.getElementById('overlay').addEventListener('click', () => document.body.classList.remove('sidebar-open'));
-      document.getElementById('main').addEventListener('click', closeSidebarIfOpen);
-
-      // Groq API key prompt
-      if (!localStorage.getItem('mumbi_groq_key')) {
-        const k = prompt("Enter your Groq API key:");
-        if (k) localStorage.setItem('mumbi_groq_key', k);
-      }
+    document.getElementById('user-input').addEventListener('input', function() { 
+      this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; 
+    });
+    document.getElementById('user-input').addEventListener('keydown', function(e) { 
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } 
     });
 
-    // Expose functions globally for onclick handlers
-    window.toggleSidebar = toggleSidebar;
-    window.cycleTheme = cycleTheme;
-    window.newChat = newChat;
-    window.send = send;
-    window.loadSession = loadSession;
-    window.showMenu = showMenu;
-    window.renameSession = renameSession;
-    window.deleteSession = deleteSession;
-    window.toggleAttachMenu = toggleAttachMenu;
-    window.handleUpload = handleUpload;
-    window.shareVessel = shareVessel;
+    updateOracleDate(); renderHistory(); newChat();
   </script>
 </body>
 </html>
