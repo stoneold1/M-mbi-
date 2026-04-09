@@ -6,7 +6,7 @@
   <title>Mūmbi — ✧</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Supabase Client -->
+  <!-- Supabase Client (stable UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
@@ -30,8 +30,7 @@
       background: var(--bg); color: var(--text-main);
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
-      display: flex; height: 100vh; overflow: hidden; transition: background 0.4s ease;
-      margin: 0;
+      display: flex; height: 100vh; overflow: hidden; margin: 0; transition: background 0.4s ease;
     }
 
     /* Sidebar */
@@ -76,7 +75,7 @@
     .header {
       padding: 40px 24px 15px; background: var(--glass); backdrop-filter: blur(15px);
       border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;
-      z-index: 10; position: relative;
+      z-index: 10;
     }
     #oracle-date {
       flex: 1; text-align: center; font-size: 0.7rem; font-weight: 500;
@@ -98,7 +97,7 @@
     .msg-wrap {
       width: 100%; max-width: 760px; margin-bottom: 32px; padding: 20px; border-radius: 18px;
       background: rgba(150, 150, 150, 0.05); border: 1px solid rgba(150, 150, 150, 0.1);
-      backdrop-filter: blur(5px); transition: transform 0.3s ease; position: relative;
+      backdrop-filter: blur(5px); transition: transform 0.3s ease;
     }
     .msg-wrap:hover {
       transform: translateY(-2px); border-color: var(--accent);
@@ -111,7 +110,7 @@
     .msg-time { font-size: 0.65rem; color: var(--text-sub); opacity: 0.6; letter-spacing: 1px; }
     .content-text { font-size: 1.05rem; white-space: pre-wrap; }
 
-    /* Input Area */
+    /* Input */
     .input-section {
       position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; padding: 24px 20px 40px;
       display: flex; justify-content: center; background: linear-gradient(to top, var(--bg) 70%, transparent);
@@ -123,7 +122,7 @@
       width: 100%; max-width: 760px; background: var(--input-bg); border-radius: 28px;
       padding: 8px 16px; display: flex; align-items: flex-end; gap: 8px;
       border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      pointer-events: auto; position: relative;
+      pointer-events: auto;
     }
 
     .attach-btn {
@@ -161,7 +160,13 @@
     }
     .share-page-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
 
-    /* Animations */
+    /* Overlay & Animations */
+    #overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+      display: none; z-index: 9000; touch-action: none;
+    }
+    body.sidebar-open #overlay { display: block; }
+
     @keyframes breathe {
       0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 5px var(--accent)); }
       50% { opacity: 1; filter: drop-shadow(0 0 15px var(--accent)); }
@@ -186,7 +191,7 @@
 </head>
 <body class="obsidian">
 
-  <div id="overlay" onclick="toggleSidebar()"></div>
+  <div id="overlay"></div>
 
   <nav id="sidebar">
     <div class="sidebar-logo">
@@ -194,12 +199,12 @@
       <div class="mumbi-brand-text">Mūmbi</div>
     </div>
     <button class="new-chat-btn" onclick="newChat()">✧ New Whisper</button>
-    <div id="history-list" class="history-list"></div>
+    <div id="history-list"></div>
   </nav>
 
   <main id="main">
     <header class="header">
-      <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.4rem; color:var(--text-main); cursor:pointer;">☰</button>
+      <button onclick="toggleSidebar()" style="background:none;border:none;font-size:1.4rem;color:var(--text-main);cursor:pointer;">☰</button>
       <div id="oracle-date"></div>
       <button class="share-page-btn" onclick="shareVessel()"><span>󰒫</span> Share</button>
       <button class="theme-toggle" onclick="cycleTheme()" id="theme-label">Mode: Obsidian</button>
@@ -238,7 +243,7 @@
 
     function initSupabase() {
       if (typeof window.supabase === 'undefined') {
-        console.error("⚠️ Supabase library did not awaken. Check the CDN.");
+        console.error("⚠️ The sacred library did not awaken.");
         return;
       }
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -248,11 +253,7 @@
     async function fetchSessions() {
       if (!sb) return;
       try {
-        const { data, error } = await sb
-          .from('whispers')
-          .select('*')
-          .order('created_at', { ascending: false });
-
+        const { data, error } = await sb.from('whispers').select('*').order('created_at', { ascending: false });
         if (error) throw error;
 
         sessions = (data || []).reduce((acc, session) => {
@@ -279,16 +280,11 @@
           messages: messages || [],
           last_updated: now
         };
-
-        // Set created_at only for new sessions
         if (!sessions[sessionId] || sessions[sessionId].messages.length <= 1) {
           payload.created_at = now;
         }
 
-        const { error } = await sb
-          .from('whispers')
-          .upsert(payload, { onConflict: 'id' });
-
+        const { error } = await sb.from('whispers').upsert(payload, { onConflict: 'id' });
         if (error) throw error;
         console.log("✧ Whisper offered to the eternal flow.");
       } catch (err) {
@@ -298,13 +294,10 @@
 
     async function deleteSession(id) {
       if (!confirm("Erase this whisper from the cycle forever?")) return;
-
       const localCopy = sessions[id] ? { ...sessions[id] } : null;
-
       try {
         const { error } = await sb.from('whispers').delete().eq('id', id);
         if (error) throw error;
-
         delete sessions[id];
         save();
         renderHistory();
@@ -324,30 +317,25 @@
       const list = document.getElementById('history-list');
       if (!list) return;
       list.innerHTML = '';
-
-      Object.keys(sessions)
-        .sort((a, b) => parseInt(b) - parseInt(a))
-        .forEach(id => {
-          const item = document.createElement('div');
-          item.className = 'history-item';
-          item.innerHTML = `
-            <div class="history-title" title="${sessions[id].title}" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
-            <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
-          list.appendChild(item);
-        });
+      Object.keys(sessions).sort((a, b) => parseInt(b) - parseInt(a)).forEach(id => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+          <div class="history-title" title="${sessions[id].title}" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
+          <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
+        list.appendChild(item);
+      });
     }
 
     function showMenu(id, e) {
       e.stopPropagation();
       document.querySelectorAll('.whisper-menu').forEach(m => m.remove());
-
       const menu = document.createElement('div');
       menu.className = 'whisper-menu';
       const actions = [
         { t: '✏️ Rename', f: () => renameSession(id) },
         { t: '🗑️ Delete', f: () => deleteSession(id) }
       ];
-
       actions.forEach(a => {
         const div = document.createElement('div');
         div.className = 'menu-item';
@@ -355,11 +343,9 @@
         div.onclick = () => { a.f(); menu.remove(); };
         menu.appendChild(div);
       });
-
       document.body.appendChild(menu);
       menu.style.left = `${e.clientX - 100}px`;
       menu.style.top = `${e.clientY + 10}px`;
-
       setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 10);
     }
 
@@ -383,6 +369,15 @@
       document.body.classList.toggle('sidebar-open');
     }
 
+    // Improved mobile sidebar closing
+    function closeSidebarIfOpen(e) {
+      if (window.innerWidth < 1000 && document.body.classList.contains('sidebar-open')) {
+        if (!e.target.closest('#sidebar') && !e.target.closest('button[onclick*="toggleSidebar"]')) {
+          document.body.classList.remove('sidebar-open');
+        }
+      }
+    }
+
     async function send() {
       const input = document.getElementById('user-input');
       const text = input.value.trim();
@@ -400,8 +395,7 @@
       renderMessage('user', text, seekerTime);
       sessions[currentId].messages.push({ role: 'user', content: text, time: seekerTime });
 
-      input.value = '';
-      input.style.height = 'auto';
+      input.value = ''; input.style.height = 'auto';
 
       try {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -436,7 +430,6 @@
     function renderMessage(role, text, timeStr) {
       const win = document.getElementById('chat-window');
       if (!win) return;
-
       const div = document.createElement('div');
       div.className = 'msg-wrap';
       const displayTime = timeStr || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -474,11 +467,8 @@
       currentId = id;
       const win = document.getElementById('chat-window');
       if (win) win.innerHTML = '';
-
       if (sessions[id]?.messages) {
-        sessions[id].messages.forEach(m => {
-          renderMessage(m.role === 'user' ? 'user' : 'oracle', m.content, m.time);
-        });
+        sessions[id].messages.forEach(m => renderMessage(m.role === 'user' ? 'user' : 'oracle', m.content, m.time));
       }
       if (window.innerWidth < 1000) toggleSidebar();
     }
@@ -515,13 +505,13 @@
         if (navigator.share) await navigator.share({ title: 'Mūmbi', url: window.location.href });
         else {
           await navigator.clipboard.writeText(window.location.href);
-          alert("Link copied to clipboard.");
+          alert("Link copied.");
         }
       } catch (err) {}
     }
 
     // ─────────────────────────────────────────────
-    // BOOTSTRAP — The Awakening
+    // AWAKENING
     // ─────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async () => {
       initSupabase();
@@ -529,14 +519,12 @@
       updateOracleDate();
       newChat();
 
-      // Event Listeners
       const userInput = document.getElementById('user-input');
       if (userInput) {
         userInput.addEventListener('input', function () {
           this.style.height = 'auto';
           this.style.height = this.scrollHeight + 'px';
         });
-
         userInput.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -545,14 +533,20 @@
         });
       }
 
-      // Groq Key Prompt
+      // Mobile sidebar improvements
+      document.getElementById('overlay').addEventListener('click', () => {
+        document.body.classList.remove('sidebar-open');
+      });
+      document.getElementById('main').addEventListener('click', closeSidebarIfOpen);
+
+      // Groq key
       if (!localStorage.getItem('mumbi_groq_key')) {
         const k = prompt("Enter your Groq API key:");
         if (k) localStorage.setItem('mumbi_groq_key', k);
       }
     });
 
-    // Global functions for onclick handlers
+    // Expose functions for onclick handlers
     window.toggleSidebar = toggleSidebar;
     window.cycleTheme = cycleTheme;
     window.newChat = newChat;
