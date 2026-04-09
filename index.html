@@ -288,9 +288,29 @@ The flame knows its own rhythm.`;
       if(n) { sessions[id].title = n; save(); renderHistory(); }
     }
 
-    function deleteSession(id) {
-      if(confirm("Erase whisper?")) { delete sessions[id]; save(); renderHistory(); newChat(); }
+    async function deleteSession(id) {
+  if(confirm("Erase whisper from the cycle?")) {
+    // 1. Remove from local memory immediately
+    delete sessions[id];
+    renderHistory();
+    newChat();
+
+    // 2. Remove from the Sacred Well (Cloud)
+    const { error } = await sb
+      .from('whispers')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error("The well refused to let go:", error.message);
+      // Optional: reload if delete fails to show it's still there
+      await fetchSessions();
     }
+    
+    // 3. Clear from browser memory
+    save(); 
+  }
+}
     
     function save() { localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); }
 
