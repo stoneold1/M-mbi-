@@ -207,9 +207,12 @@ async function fetchSessions() {
   } else {
     // Map the array back into your sessions object format
     sessions = data.reduce((acc, session) => {
-      acc[session.id] = { title: session.title, messages: session.messages };
-      return acc;
-    }, {});
+      acc[session.id] = { 
+    title: session.title || "Untitled Whisper", // Fallback if title is missing
+    messages: session.messages || [] 
+  };
+  return acc;
+}, {});
     renderHistory();
   }
 }
