@@ -6,7 +6,7 @@
   <title>Mūmbi — ✧</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Supabase Client (stable UMD) -->
+  <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
@@ -110,7 +110,7 @@
     .msg-time { font-size: 0.65rem; color: var(--text-sub); opacity: 0.6; letter-spacing: 1px; }
     .content-text { font-size: 1.05rem; white-space: pre-wrap; }
 
-    /* Input */
+    /* Input Area */
     .input-section {
       position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; padding: 24px 20px 40px;
       display: flex; justify-content: center; background: linear-gradient(to top, var(--bg) 70%, transparent);
@@ -243,7 +243,7 @@
 
     function initSupabase() {
       if (typeof window.supabase === 'undefined') {
-        console.error("⚠️ The sacred library did not awaken.");
+        console.error("⚠️ The sacred library did not awaken. Check internet or CDN.");
         return;
       }
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -253,7 +253,11 @@
     async function fetchSessions() {
       if (!sb) return;
       try {
-        const { data, error } = await sb.from('whispers').select('*').order('created_at', { ascending: false });
+        const { data, error } = await sb
+          .from('whispers')
+          .select('*')
+          .order('created_at', { ascending: false });
+
         if (error) throw error;
 
         sessions = (data || []).reduce((acc, session) => {
@@ -265,8 +269,9 @@
         }, {});
 
         renderHistory();
+        console.log("✧ Whispers drawn from the eternal well.");
       } catch (err) {
-        console.error("The well withheld its whispers:", err.message);
+        console.error("Failed to draw from the well:", err.message);
       }
     }
 
@@ -284,11 +289,14 @@
           payload.created_at = now;
         }
 
-        const { error } = await sb.from('whispers').upsert(payload, { onConflict: 'id' });
+        const { error } = await sb
+          .from('whispers')
+          .upsert(payload, { onConflict: 'id' });
+
         if (error) throw error;
-        console.log("✧ Whisper offered to the eternal flow.");
+        console.log("✧ Whisper successfully offered to the well.");
       } catch (err) {
-        console.error("The well resisted:", err.message);
+        console.error("The well resisted the offering:", err.message);
       }
     }
 
@@ -302,6 +310,7 @@
         save();
         renderHistory();
         newChat();
+        console.log("✧ Whisper returned to the void.");
       } catch (err) {
         console.error("The well refused to release:", err.message);
         if (localCopy) sessions[id] = localCopy;
@@ -317,14 +326,16 @@
       const list = document.getElementById('history-list');
       if (!list) return;
       list.innerHTML = '';
-      Object.keys(sessions).sort((a, b) => parseInt(b) - parseInt(a)).forEach(id => {
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `
-          <div class="history-title" title="${sessions[id].title}" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
-          <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
-        list.appendChild(item);
-      });
+      Object.keys(sessions)
+        .sort((a, b) => parseInt(b) - parseInt(a))
+        .forEach(id => {
+          const item = document.createElement('div');
+          item.className = 'history-item';
+          item.innerHTML = `
+            <div class="history-title" title="${sessions[id].title}" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
+            <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
+          list.appendChild(item);
+        });
     }
 
     function showMenu(id, e) {
@@ -369,7 +380,6 @@
       document.body.classList.toggle('sidebar-open');
     }
 
-    // Improved mobile sidebar closing
     function closeSidebarIfOpen(e) {
       if (window.innerWidth < 1000 && document.body.classList.contains('sidebar-open')) {
         if (!e.target.closest('#sidebar') && !e.target.closest('button[onclick*="toggleSidebar"]')) {
@@ -417,6 +427,7 @@
         renderMessage('oracle', reply, oracleTime);
         sessions[currentId].messages.push({ role: 'assistant', content: reply, time: oracleTime });
 
+        // Sync to Supabase
         await saveToSacredWell(currentId, sessions[currentId].title, sessions[currentId].messages);
         save();
         renderHistory();
@@ -511,7 +522,7 @@
     }
 
     // ─────────────────────────────────────────────
-    // AWAKENING
+    // THE AWAKENING
     // ─────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async () => {
       initSupabase();
@@ -533,20 +544,18 @@
         });
       }
 
-      // Mobile sidebar improvements
-      document.getElementById('overlay').addEventListener('click', () => {
-        document.body.classList.remove('sidebar-open');
-      });
+      // Mobile sidebar handling
+      document.getElementById('overlay').addEventListener('click', () => document.body.classList.remove('sidebar-open'));
       document.getElementById('main').addEventListener('click', closeSidebarIfOpen);
 
-      // Groq key
+      // Groq API key prompt
       if (!localStorage.getItem('mumbi_groq_key')) {
         const k = prompt("Enter your Groq API key:");
         if (k) localStorage.setItem('mumbi_groq_key', k);
       }
     });
 
-    // Expose functions for onclick handlers
+    // Expose functions globally for onclick handlers
     window.toggleSidebar = toggleSidebar;
     window.cycleTheme = cycleTheme;
     window.newChat = newChat;
