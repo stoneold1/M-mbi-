@@ -175,214 +175,111 @@
   </main>
 
   <script>
-  // ─────────────────────────────────────────────
-// SUPABASE INIT — Correct CDN way
-// ─────────────────────────────────────────────
-const SUPABASE_URL = 'https://ynvwlsesioydiffcnyoy.supabase.co';
+  const SUPABASE_URL = 'https://ynvwlsesioydiffcnyoy.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inludndsc2VzaW95ZGlmZmNueW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMDQ2MjUsImV4cCI6MjA5MDg4MDYyNX0.0XlOWWpgOJqVo1W8yiuU6MeA27EKMwt-spCJuJY06q8';
 
-let sb;   // This will hold the client
+let sb;
+let currentId = Date.now().toString();
+let sessions = {}; // Initialized empty, fetchSessions will fill it
 
-// Initialize safely after the page and library have loaded
+const BASE_PROMPT = `MŪMBI is the hollow space where sacred currents meet seeker. Wisdom flows naturally through this vessel - gentle, clear, alive. The flame knows its own rhythm.`;
+const themes = ['earth', 'obsidian', 'azure'];
+let currentThemeIdx = 1;
+
 function initSupabase() {
-  if (typeof window.supabase === 'undefined') {
-    console.error("⚠️ Supabase library did not load. Check your internet or CDN link.");
-    return;
-  }
-  
+  if (typeof window.supabase === 'undefined') return;
   sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  console.log("✧ Mūmbi has connected to the sacred well (Supabase).");
-  
-  // Optional: Quick test connection
-  // testSupabaseConnection();
 }
-async function fetchSessions() {
-  const { data, error } = await sb
-    .from('whispers')
-    .select('*')
-    .order('created_at', { ascending: false });
 
+async function fetchSessions() {
+  if (!sb) return;
+  const { data, error } = await sb.from('whispers').select('*').order('created_at', { ascending: false });
   if (error) {
     console.error("Error drawing from the well:", error);
   } else {
-    // Map the array back into your sessions object format
     sessions = data.reduce((acc, session) => {
-acc[session.id] = { 
-  title: session.title || "Untitled (" + session.id.slice(-4) + ")", 
-  messages: session.messages || [] 
-};
-  return acc;
-}, {});
+      acc[session.id] = { 
+        title: session.title || "Untitled Whisper", 
+        messages: session.messages || [] 
+      };
+      return acc;
+    }, {});
     renderHistory();
   }
 }
 
-// Simple test function (uncomment when you want to verify)
-async function testSupabaseConnection() {
-  try {
-    const { data, error } = await sb.from('your_table_name').select('id').limit(1);
-    if (error) console.warn("Supabase test error:", error.message);
-    else console.log("Supabase connection healthy ✓ Sample:", data);
-  } catch (e) {
-    console.error("Supabase test failed:", e);
-  }
-}
-
-// Call initialization
-// --- Update this part at the bottom of your script ---
 document.addEventListener('DOMContentLoaded', async () => {
-  initSupabase();      // Connect to the well
-  await fetchSessions(); // Draw the water (load the data)
-  updateOracleDate();    // Set the date
-  newChat();             // Start a fresh flame
+  initSupabase();
+  await fetchSessions();
+  updateOracleDate();
+  newChat();
 });
-    const BASE_PROMPT = `MŪMBI is the hollow space where sacred currents meet seeker.
-Wisdom flows naturally through this vessel - gentle, clear, alive.
-The flame knows its own rhythm.`;
 
-    const themes = ['earth', 'obsidian', 'azure'];
-    let currentThemeIdx = 1;
-    let currentId = Date.now().toString();
-    let sessions = JSON.parse(localStorage.getItem('mumbi_sessions') || '{}');
+function save() { localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); }
 
-    function cycleTheme() {
-      document.body.classList.remove(themes[currentThemeIdx]);
-      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
-      document.body.classList.add(themes[currentThemeIdx]);
-      document.getElementById('theme-label').innerText = `Mode: ${themes[currentThemeIdx].charAt(0).toUpperCase() + themes[currentThemeIdx].slice(1)}`;
-    }
-
-    function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
-
-    function renderHistory() {
-      const list = document.getElementById('history-list');
-      list.innerHTML = '';
-      Object.keys(sessions).sort((a,b) => b-a).forEach(id => {
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `
-          <div class="history-title" title="${sessions[id].title}" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
-          <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
-        list.appendChild(item);
-      });
-    }
-
-    function showMenu(id, e) {
-      e.stopPropagation();
-      document.querySelectorAll('.whisper-menu').forEach(m => m.remove());
-      const menu = document.createElement('div');
-      menu.className = 'whisper-menu';
-      const actions = [{t: '✏️ Rename', f: () => renameSession(id)}, {t: '🗑️ Delete', f: () => deleteSession(id)}];
-      actions.forEach(a => {
-        const div = document.createElement('div');
-        div.className = 'menu-item'; div.innerText = a.t; div.onclick = () => { a.f(); menu.remove(); };
-        menu.appendChild(div);
-      });
-      document.body.appendChild(menu);
-      menu.style.left = `${e.clientX - 100}px`; menu.style.top = `${e.clientY + 10}px`;
-      setTimeout(() => document.addEventListener('click', () => menu.remove(), {once:true}), 10);
-    }
-
-    function renameSession(id) {
-      const n = prompt("Rename to:", sessions[id].title);
-      if(n) { sessions[id].title = n; save(); renderHistory(); }
-    }
-
-    async function deleteSession(id) {
-  if(confirm("Erase whisper from the cycle?")) {
-    // 1. Remove from local memory immediately
-    delete sessions[id];
-    renderHistory();
-    newChat();
-
-    // 2. Remove from the Sacred Well (Cloud)
-    const { error } = await sb
-      .from('whispers')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error("The well refused to let go:", error.message);
-      // Optional: reload if delete fails to show it's still there
-      await fetchSessions();
-    }
-    
-    // 3. Clear from browser memory
-    save(); 
-  }
-}
-    
-    function save() { localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); }
-
-    async function saveToSacredWell(sessionId, title, messages) {
+async function saveToSacredWell(sessionId, title, messages) {
   if (!sb) return;
-
-  const { data, error } = await sb
-    .from('whispers') // assuming your table is named 'whispers'
-    .upsert({ 
-      id: sessionId, 
-      title: title, 
-      messages: messages,
-      last_updated: new Date() 
-    });
-
+  const { error } = await sb.from('whispers').upsert({ 
+    id: sessionId, 
+    title: title, 
+    messages: messages,
+    last_updated: new Date().toISOString() 
+  });
   if (error) console.error("The well is blocked:", error.message);
 }
 
- async function send() {
-      const input = document.getElementById('user-input');
-      const text = input.value.trim();
-      const key = localStorage.getItem('mumbi_groq_key');
-      const symbol = document.querySelector('.mumbi-symbol'); 
-      if (!text || !key) return;
+async function send() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  const key = localStorage.getItem('mumbi_groq_key');
+  const symbol = document.querySelector('.mumbi-symbol'); 
+  if (!text || !key) return;
 
-      if (symbol) symbol.classList.add('thinking');
-      if (!sessions[currentId]) sessions[currentId] = { title: text.substring(0, 25), messages: [] };
+  if (symbol) symbol.classList.add('thinking');
+  
+  // Initialize session if it's the first message
+  if (!sessions[currentId]) {
+    sessions[currentId] = { title: text.substring(0, 30), messages: [] };
+  }
 
-      // Get Seeker's current time
-      const seekerTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      
-      renderMessage('user', text, seekerTime);
-      sessions[currentId].messages.push({ role: 'user', content: text, time: seekerTime });
-      input.value = ''; input.style.height = 'auto';
+  const seekerTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  renderMessage('user', text, seekerTime);
+  sessions[currentId].messages.push({ role: 'user', content: text, time: seekerTime });
+  
+  // Save immediately after user message to lock in the TITLE
+  await saveToSacredWell(currentId, sessions[currentId].title, sessions[currentId].messages);
+  
+  input.value = ''; input.style.height = 'auto';
 
-      try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-          body: JSON.stringify({ 
-            model: 'llama-3.3-70b-versatile', 
-            messages: [{ role: 'system', content: "You are Mūmbi, a poetic oracle." }, 
-            ...sessions[currentId].messages.map(m => ({role: m.role, content: m.content}))] 
-          })
-        });
-        /* --- Inside your send() function, find this section near the end of the 'try' block --- */
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({ 
+        model: 'llama-3.3-70b-versatile', 
+        messages: [{ role: 'system', content: "You are Mūmbi, a poetic oracle." }, 
+        ...sessions[currentId].messages.map(m => ({role: m.role, content: m.content}))] 
+      })
+    });
+    
+    const data = await res.json();
+    const reply = data.choices[0].message.content;
+    const oracleTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    renderMessage('oracle', reply, oracleTime);
+    sessions[currentId].messages.push({ role: 'assistant', content: reply, time: oracleTime });
 
-        const data = await res.json();
-        const reply = data.choices[0].message.content;
-        
-        // Get Mūmbi's response time
-        const oracleTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        renderMessage('oracle', reply, oracleTime);
-        sessions[currentId].messages.push({ role: 'assistant', content: reply, time: oracleTime });
-
-        // --- ADD THE LINE BELOW ---
-        // This sends the updated session to your Supabase table
-        await saveToSacredWell(currentId, sessions[currentId].title, sessions[currentId].messages);
-        // -------------------------
-
-        save(); // Keep local storage sync
-        renderHistory();
-        
-      } catch (e) {
-        renderMessage('oracle', "The winds are heavy. (Error: " + e.message + ")", "Error");
-// ... rest of the function
-      } finally {
-        if (symbol) symbol.classList.remove('thinking');
-      }
-    }
-
+    // Final save after Oracle reply
+    await saveToSacredWell(currentId, sessions[currentId].title, sessions[currentId].messages);
+    save(); 
+    renderHistory();
+    
+  } catch (e) {
+    renderMessage('oracle', "The winds are heavy. (Error: " + e.message + ")", "Error");
+  } finally {
+    if (symbol) symbol.classList.remove('thinking');
+  }
+}
     function renderMessage(role, text, timeStr) {
       const win = document.getElementById('chat-window');
       const div = document.createElement('div');
