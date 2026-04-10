@@ -1,299 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Mūmbi — ✧</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --bg: #f9f7f2; --sidebar: #f0ede6; --text-main: #1f1f1f; --text-sub: #6b5f4e;
-      --accent: #b8860b; --border: #d9d2c3; --input-bg: #ffffff; --glass: rgba(255, 255, 255, 0.8);
-      --sidebar-width: 280px;
-    }
-    body.obsidian {
-      --bg: #000000; --sidebar: #0a0a0a; --text-main: #e3e3e3; --text-sub: #9aa0a6;
-      --accent: #d4b36b; --border: rgba(255, 255, 255, 0.12); --input-bg: rgba(20, 20, 22, 0.7);
-      --glass: rgba(10, 10, 10, 0.7);
-    }
-    body.azure {
-      --bg: #060f21; --sidebar: #0a1429; --text-main: #d1dbff; --text-sub: #7a8eb5;
-      --accent: #4f9cf9; --border: rgba(79, 156, 249, 0.15); 
-      --input-bg: rgba(10, 20, 40, 0.7); --glass: rgba(6, 15, 33, 0.85);
-    }
-    
-    body {
-      background: var(--bg); color: var(--text-main);
-      font-family: 'Inter', -apple-system, system-ui, sans-serif;
-      font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
-      display: flex; height: 100vh; overflow: hidden; transition: background 0.4s ease;
-    }
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Mūmbi — ✧</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f9f7f2; --sidebar: #f0ede6; --text-main: #1f1f1f; --text-sub: #6b5f4e;
+            --accent: #b8860b; --border: #d9d2c3; --input-bg: #ffffff; --glass: rgba(255, 255, 255, 0.8);
+            --sidebar-width: 280px;
+        }
+        body.obsidian {
+            --bg: #000000; --sidebar: #0a0a0a; --text-main: #e3e3e3; --text-sub: #9aa0a6;
+            --accent: #d4b36b; --border: rgba(255, 255, 255, 0.12); --input-bg: rgba(20, 20, 22, 0.7);
+            --glass: rgba(10, 10, 10, 0.7);
+        }
+        body.azure {
+            --bg: #060f21; --sidebar: #0a1429; --text-main: #d1dbff; --text-sub: #7a8eb5;
+            --accent: #4f9cf9; --border: rgba(79, 156, 249, 0.15);
+            --input-bg: rgba(10, 20, 40, 0.7); --glass: rgba(6, 15, 33, 0.85);
+        }
 
-    /* --- Sidebar --- */
-    #sidebar {
-      width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--border);
-      padding: 60px 16px 24px; display: flex; flex-direction: column; position: fixed;
-      left: 0; top: 0; height: 100%; z-index: 9999; transition: transform 0.4s ease;
-    }
-    .sidebar-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; text-align: center; }
-    .mumbi-symbol { font-size: 3rem; color: var(--accent); margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(184, 134, 11, 0.2)); }
-    .mumbi-brand-text { font-weight: 600; font-size: 1rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
+        body {
+            background: var(--bg); color: var(--text-main);
+            font-family: 'Inter', sans-serif; margin: 0;
+            display: flex; height: 100vh; overflow: hidden; transition: background 0.4s ease;
+        }
 
-    @media (max-width: 999px) { #sidebar { transform: translateX(-100%); } body.sidebar-open #sidebar { transform: translateX(0); } }
+        #sidebar {
+            width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--border);
+            padding: 60px 16px 24px; display: flex; flex-direction: column; position: fixed;
+            left: 0; top: 0; height: 100%; z-index: 9999; transition: transform 0.4s ease; box-sizing: border-box;
+        }
 
-    .new-chat-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 24px; cursor: pointer; font-weight: 500; margin-bottom: 24px; font-size: 0.9rem; }
-    .history-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: 0.2s; gap: 8px; }
-    .history-item:hover { background: rgba(150, 150, 150, 0.1); }
-    .history-title { flex: 1; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); opacity: 0.8; }
-    .dots-menu { background: rgba(150, 150, 150, 0.1); border: none; color: var(--accent); cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; opacity: 0.4; transition: 0.2s; }
+        .sidebar-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; text-align: center; }
+        .mumbi-symbol { font-size: 3.2rem; color: var(--accent); margin-bottom: 8px; transition: 0.3s; cursor: default; }
+        .mumbi-brand-text { font-weight: 600; letter-spacing: 1px; color: var(--accent); transition: color 0.4s ease; }
+        .mumbi-symbol.thinking { opacity: 0.5; animation: pulse 1.5s infinite ease-in-out; }
 
-    /* --- Main Canvas --- */
-    #main { flex: 1; display: flex; flex-direction: column; position: relative; margin-left: var(--sidebar-width); transition: margin-left 0.4s ease; scroll-behavior: smooth; }
-    @media (max-width: 999px) { #main { margin-left: 0; } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
-    .header { padding: 40px 24px 15px; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; z-index: 10; position: relative; }
-    
-    #oracle-date {
-      flex: 1; text-align: center; font-size: 0.7rem; font-weight: 500;
-      letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
-      opacity: 0.8;
-    }
+        .new-chat-btn {
+            background: var(--accent); color: #000; border: none; padding: 14px 20px;
+            border-radius: 24px; cursor: pointer; font-weight: 600; margin-bottom: 32px;
+            width: 100%; box-sizing: border-box; font-size: 1rem; transition: all 0.3s ease;
+        }
+        .new-chat-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(184, 134, 11, 0.35); }
 
-    .theme-toggle { margin-left: 8px; background: rgba(150, 150, 150, 0.1); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; color: var(--text-main); cursor: pointer; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s ease; }
-    .chat-view { flex: 1; overflow-y: auto; padding: 60px 20px 200px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
+        .history-item {
+            position: relative; padding: 16px 44px 16px 16px; border-radius: 16px;
+            cursor: pointer; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-main);
+            opacity: 0.85; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent; display: flex; align-items: center; gap: 12px;
+        }
+        .history-item:hover { background: rgba(184, 134, 11, 0.08); border-color: var(--accent); opacity: 1; }
+        .history-item.active { background: var(--input-bg); border-color: var(--accent); opacity: 1; box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.25); }
+        .history-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; line-height: 1.3; margin-bottom: 4px; }
+        .history-preview { font-size: 0.78rem; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .history-dots {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            opacity: 0; transition: opacity 0.2s ease; cursor: pointer; font-size: 1.4rem; color: var(--text-sub);
+            padding: 6px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+        }
+        .history-item:hover .history-dots { opacity: 1; }
 
-    .msg-wrap { width: 100%; max-width: 760px; margin-bottom: 32px; padding: 20px; border-radius: 18px; background: rgba(150, 150, 150, 0.05); border: 1px solid rgba(150, 150, 150, 0.1); backdrop-filter: blur(5px); transition: all 0.3s ease; position: relative; }
-    .msg-wrap:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1); }
-    
-    .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .label { font-weight: 600; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
-    .msg-time { font-size: 0.65rem; color: var(--text-sub); opacity: 0.6; }
-    .content-text { font-size: 1.05rem; white-space: pre-wrap; }
+        .history-menu {
+            position: fixed !important; background: var(--input-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 8px 0; width: 140px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            z-index: 10001; display: none; opacity: 0; transform: translateY(10px);
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .history-menu.show { opacity: 1; transform: translateY(0); }
+        .history-menu button { width: 100%; padding: 12px 16px; background: none; border: none; text-align: left; font-size: 0.85rem; color: var(--text-main); cursor: pointer; }
+        .history-menu button:hover { background: rgba(184, 134, 11, 0.12); }
 
-    /* --- Input Area --- */
-    .input-section { position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; padding: 24px 20px 40px; display: flex; justify-content: center; background: linear-gradient(to top, var(--bg) 70%, transparent); pointer-events: none; }
-    .input-pill { width: 100%; max-width: 760px; background: var(--input-bg); border-radius: 28px; padding: 8px 16px; display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); pointer-events: auto; position: relative; }
-    @media (max-width: 999px) { .input-section { left: 0; } }
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; margin-left: var(--sidebar-width); transition: margin-left 0.4s ease; height: 100vh; }
+        @media (max-width: 999px) { #main { margin-left: 0; } #sidebar { transform: translateX(-100%); } body.sidebar-open #sidebar { transform: translateX(0); } }
 
-    textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--text-main); resize: none; max-height: 200px; padding: 10px 0; font-size: 1rem; font-family: inherit; }
-    .send-btn { background: var(--accent); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; flex-shrink: 0; }
+        .header { padding: 15px 20px; background: var(--glass); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; z-index: 10; }
+        #oracle-date { flex: 1; text-align: center; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+        .header-btn { background: rgba(150, 150, 150, 0.1); border: 1px solid var(--border); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-main); cursor: pointer; transition: all 0.2s; }
 
-    /* --- Menu --- */
-    .whisper-menu { position: fixed; background: var(--sidebar); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 10000; padding: 6px 0; min-width: 140px; }
-    .menu-item { padding: 10px 16px; font-size: 0.85rem; cursor: pointer; color: var(--text-main); }
-    .menu-item:hover { background: rgba(150,150,150,0.1); }
+        .chat-view { flex: 1; overflow-y: auto; padding: 20px 20px 220px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
+        .msg-wrap { width: 100%; max-width: 760px; margin-bottom: 24px; padding: 24px; border-radius: 18px; background: rgba(150, 150, 150, 0.05); border: 1px solid rgba(150, 150, 150, 0.1); box-sizing: border-box; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(150, 150, 150, 0.1); padding-bottom: 8px; }
+        .label { font-weight: 600; font-size: 0.75rem; color: var(--accent); text-transform: uppercase; }
+        .content-text { font-size: 1.05rem; line-height: 1.7; }
+        .content-text strong { color: var(--accent); font-weight: 600; }
+        .msg-time { font-size: 0.72rem; color: var(--text-sub); opacity: 0.85; }
+        .flame-symbol { font-size: 1.1rem; color: #ff8c00; }
 
-    /* --- Animations --- */
-    @keyframes breathe { 0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 5px var(--accent)); } 50% { opacity: 1; filter: drop-shadow(0 0 15px var(--accent)); } }
-    @keyframes shimmer { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .mumbi-symbol { animation: breathe 4s infinite ease-in-out; }
-    .mumbi-symbol.thinking { animation: shimmer 1.5s infinite linear; color: #fff; }
-    #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; z-index: 9000; }
-    body.sidebar-open #overlay { display: block; }
-  </style>
+        .vision-img { width: 100%; border-radius: 12px; margin-top: 16px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; transition: opacity 1.5s ease; cursor: zoom-in; }
+
+        .input-section { position: fixed; bottom: 0; left: var(--sidebar-width); right: 0; padding: 20px; display: flex; justify-content: center; background: linear-gradient(to top, var(--bg) 60%, transparent); pointer-events: none; }
+        @media (max-width: 999px) { .input-section { left: 0; } }
+        .input-pill { width: 100%; max-width: 760px; background: var(--input-bg); border-radius: 30px; padding: 10px 16px; display: flex; align-items: flex-end; gap: 10px; border: 1px solid var(--border); pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--text-main); resize: none; max-height: 180px; font-size: 1rem; padding: 8px 0; font-family: inherit; }
+        .tool-btn { background: none; border: none; color: var(--text-main); font-size: 1.4rem; cursor: pointer; padding: 8px; opacity: 0.7; transition: 0.2s; }
+        .tool-btn:hover { opacity: 1; color: var(--accent); }
+        .send-btn { background: var(--accent); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 9000; }
+        body.sidebar-open #overlay { display: block; }
+    </style>
 </head>
 <body class="obsidian">
-  <div id="overlay" onclick="toggleSidebar()"></div>
-  
-  <nav id="sidebar">
-    <div class="sidebar-logo">
-      <div class="mumbi-symbol">✧</div>
-      <div class="mumbi-brand-text">Mūmbi</div>
-    </div>
-    <button class="new-chat-btn" onclick="newChat()">✧ New Whisper</button>
-    <div class="history-list" id="history-list"></div>
-  </nav>
-
-  <main id="main">
-    <header class="header">
-      <button onclick="toggleSidebar()" style="background:none; border:none; font-size:1.4rem; color:var(--text-main); cursor:pointer;">☰</button>
-      <div id="oracle-date"></div>
-      <button class="theme-toggle" onclick="cycleTheme()" id="theme-label">Mode: Obsidian</button>
-    </header>
-
-    <div class="chat-view" id="chat-window"></div>
-
-    <div class="input-section">
-      <div class="input-pill">
-        <textarea id="user-input" rows="1" placeholder="Whisper a question..."></textarea>
-        <button class="send-btn" onclick="send()">↑</button>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    const BASE_PROMPT = `MŪMBI is the hollow space where sacred currents meet seeker. Wisdom flows naturally through this vessel - gentle, clear, alive. The flame knows its own rhythm.`;
-    const themes = ['earth', 'obsidian', 'azure'];
+    <div id="overlay" onclick="toggleSidebar()"></div>
     
-    // Load persisted state
-    let currentThemeIdx = parseInt(localStorage.getItem('mumbi_theme')) || 1;
-    let currentId = Date.now().toString();
-    let sessions = JSON.parse(localStorage.getItem('mumbi_sessions') || '{}');
-
-    // Initialize Theme
-    document.body.className = themes[currentThemeIdx];
-    document.getElementById('theme-label').innerText = `Mode: ${themes[currentThemeIdx].charAt(0).toUpperCase() + themes[currentThemeIdx].slice(1)}`;
-
-    function cycleTheme() {
-      document.body.classList.remove(themes[currentThemeIdx]);
-      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
-      document.body.classList.add(themes[currentThemeIdx]);
-      localStorage.setItem('mumbi_theme', currentThemeIdx);
-      document.getElementById('theme-label').innerText = `Mode: ${themes[currentThemeIdx].charAt(0).toUpperCase() + themes[currentThemeIdx].slice(1)}`;
-    }
-
-    function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
-
-    function renderHistory() {
-      const list = document.getElementById('history-list');
-      list.innerHTML = '';
-      Object.keys(sessions).sort((a,b) => b-a).forEach(id => {
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `
-          <div class="history-title" onclick="loadSession('${id}')">📜 ${sessions[id].title}</div>
-          <button class="dots-menu" onclick="showMenu('${id}', event)">⋯</button>`;
-        list.appendChild(item);
-      });
-    }
-
-    function showMenu(id, e) {
-      e.stopPropagation();
-      document.querySelectorAll('.whisper-menu').forEach(m => m.remove());
-      const menu = document.createElement('div');
-      menu.className = 'whisper-menu';
-      const actions = [{t: '✏️ Rename', f: () => renameSession(id)}, {t: '🗑️ Delete', f: () => deleteSession(id)}];
-      actions.forEach(a => {
-        const div = document.createElement('div');
-        div.className = 'menu-item'; div.innerText = a.t; div.onclick = () => { a.f(); menu.remove(); };
-        menu.appendChild(div);
-      });
-      document.body.appendChild(menu);
-      menu.style.left = `${e.clientX - 100}px`; menu.style.top = `${e.clientY + 10}px`;
-      setTimeout(() => document.addEventListener('click', () => menu.remove(), {once:true}), 10);
-    }
-
-    function renameSession(id) {
-      const n = prompt("Rename to:", sessions[id].title);
-      if(n) { sessions[id].title = n; save(); renderHistory(); }
-    }
-
-    function deleteSession(id) {
-      if(confirm("Erase whisper?")) { delete sessions[id]; save(); renderHistory(); newChat(); }
-    }
-
-    function save() { localStorage.setItem('mumbi_sessions', JSON.stringify(sessions)); }
-
-    async function send() {
-      const input = document.getElementById('user-input');
-      const text = input.value.trim();
-      const key = localStorage.getItem('mumbi_groq_key');
-      const symbol = document.querySelector('.mumbi-symbol'); 
-      
-      if (!text) return;
-      if (!key) {
-        const k = prompt("The Oracle requires a Groq Key to speak:");
-        if (k) localStorage.setItem('mumbi_groq_key', k);
-        return;
-      }
-
-      if (symbol) symbol.classList.add('thinking');
-      if (!sessions[currentId]) sessions[currentId] = { title: text.substring(0, 25), messages: [] };
-
-      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      renderMessage('user', text, time);
-      sessions[currentId].messages.push({ role: 'user', content: text, time: time });
-      
-      input.value = ''; input.style.height = 'auto';
-
-      try {
-        const historyForAPI = sessions[currentId].messages.map(m => ({
-          role: m.role === 'oracle' ? 'assistant' : m.role,
-          content: m.content
-        }));
-
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-          body: JSON.stringify({ 
-            model: 'llama-3.3-70b-versatile', 
-            messages: [{ role: 'system', content: BASE_PROMPT }, ...historyForAPI] 
-          })
-        });
-
-        const data = await res.json();
-        const reply = data.choices[0].message.content;
-        const oracleTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    <nav id="sidebar">
+        <div class="sidebar-logo">
+            <div class="mumbi-symbol" id="main-symbol">✧</div>
+            <div class="mumbi-brand-text">Mūmbi</div>
+        </div>
+        <button class="new-chat-btn" onclick="startFresh()">+ New Whisper</button>
+        <div id="history-list" style="overflow-y: auto; flex: 1; padding-right: 8px;"></div>
+    </nav>
+    
+    <main id="main">
+        <header class="header">
+            <button class="header-btn" onclick="toggleSidebar()">☰</button>
+            <div id="oracle-date"></div>
+            <button class="header-btn" onclick="shareSession()">⎙</button>
+            <button class="header-btn" onclick="cycleTheme()" id="theme-label">🌑</button>
+        </header>
         
-        renderMessage('oracle', reply, oracleTime);
-        sessions[currentId].messages.push({ role: 'oracle', content: reply, time: oracleTime });
-        save(); renderHistory();
-      } catch (e) {
-        renderMessage('oracle', "The winds are heavy. (Error: " + e.message + ")", "Error");
-      } finally {
-        if (symbol) symbol.classList.remove('thinking');
-      }
-    }
+        <div class="chat-view" id="chat-window"></div>
+        
+        <div class="input-section">
+            <div class="input-pill">
+                <button class="tool-btn" onclick="document.getElementById('universal-upload').click()" title="Offer Scroll">📎</button>
+                <button class="tool-btn" onclick="seekVision()" title="Seek Vision">✧</button>
+                <input type="file" id="universal-upload" style="display:none" onchange="handleFile(event)">
+                <textarea id="user-input" rows="1" placeholder="Whisper..." oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+                <button class="send-btn" onclick="send()">↑</button>
+            </div>
+        </div>
+    </main>
 
-    function renderMessage(role, text, timeStr) {
-      const win = document.getElementById('chat-window');
-      const div = document.createElement('div');
-      div.className = 'msg-wrap';
-      div.innerHTML = `
-        <div class="block">
-          <div class="label-row">
-            <div class="label">${role === 'user' ? 'Seeker' : '✧ Mūmbi'}</div>
-            <div class="msg-time">${timeStr}</div>
-          </div>
-          <div class="content-text"></div>
-        </div>`;      
-      win.appendChild(div);
-      const contentDiv = div.querySelector('.content-text');
-      
-      if (role === 'oracle') {
-        let i = 0;
-        function type() { 
-          if (i < text.length) { 
-            contentDiv.textContent += text.charAt(i); 
-            i++; 
-            setTimeout(type, 10); 
-            win.scrollTop = win.scrollHeight; 
-          } 
+    <script>
+        let currentId = null;
+        let sessions = JSON.parse(localStorage.getItem('mumbi_v4_sessions') || '{}');
+        const themes = ['earth', 'obsidian', 'azure'];
+        const icons = ['🌿', '🌑', '💎'];
+        let currentThemeIdx = parseInt(localStorage.getItem('mumbi_theme')) || 1;
+
+        document.body.className = themes[currentThemeIdx];
+        document.getElementById('theme-label').textContent = icons[currentThemeIdx];
+
+        // --- UTILS ---
+        function formatWhisper(text) {
+            if (text.startsWith('VISION_DATA|')) return text; // Don't format raw vision data
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
         }
-        type();
-      } else { 
-        contentDiv.textContent = text; 
-      }
-      win.scrollTop = win.scrollHeight;
-    }
 
-    function loadSession(id) {
-      currentId = id; 
-      document.getElementById('chat-window').innerHTML = '';
-      sessions[id].messages.forEach(m => renderMessage(m.role, m.content, m.time));
-      if(window.innerWidth < 1000) toggleSidebar();
-    }
+        function getSeekerTimestamp() {
+            return new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '');
+        }
 
-    function newChat() { 
-      currentId = Date.now().toString(); 
-      document.getElementById('chat-window').innerHTML = ''; 
-      renderMessage('oracle', "The flame is lit. What do you seek?", "Now"); 
-    }
+        function toggleSidebar() { document.body.classList.toggle('sidebar-open'); }
 
-    function updateOracleDate() {
-      const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-      document.getElementById('oracle-date').innerText = today + " • Eternal Cycle";
-    }
+        function cycleTheme() {
+            currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+            document.body.className = themes[currentThemeIdx];
+            document.getElementById('theme-label').textContent = icons[currentThemeIdx];
+            localStorage.setItem('mumbi_theme', currentThemeIdx);
+        }
 
-    document.getElementById('user-input').addEventListener('input', function() { 
-      this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; 
-    });
-    document.getElementById('user-input').addEventListener('keydown', function(e) { 
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } 
-    });
+        // --- CORE UI ---
+        function renderMessage(role, text, isNew = false) {
+            if (text.startsWith('VISION_DATA|')) {
+                const [_, prompt, url] = text.split('|');
+                return renderVisionUI(role, prompt, url);
+            }
 
-    updateOracleDate(); renderHistory(); newChat();
-  </script>
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = 'msg-wrap';
+            
+            let timestampHTML = role === 'user' 
+                ? `<span class="msg-time">${getSeekerTimestamp()}</span>` 
+                : `<span class="flame-symbol">🔥</span>`;
+            
+            div.innerHTML = `
+                <div class="label-row">
+                    <span class="label">${role==='user' ? 'Seeker' : '✧ Mūmbi'}</span>
+                    ${timestampHTML}
+                </div>
+                <div class="content-text"></div>
+            `;
+            
+            win.appendChild(div);
+            const target = div.querySelector('.content-text');
+           
+            if (role === 'oracle' && isNew) {
+                let i = 0;
+                const type = () => {
+                    if (i < text.length) {
+                        target.innerHTML = formatWhisper(text.substring(0, i + 1));
+                        i++;
+                        setTimeout(type, 10);
+                        win.scrollTop = win.scrollHeight;
+                    }
+                };
+                type();
+            } else {
+                target.innerHTML = formatWhisper(text);
+                win.scrollTop = win.scrollHeight;
+            }
+        }
+
+        function renderVisionUI(role, prompt, url) {
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = 'msg-wrap';
+            div.innerHTML = `
+                <div class="label-row">
+                    <span class="label">✧ Mūmbi — Manifestation</span>
+                    <span class="flame-symbol">✨</span>
+                </div>
+                <div class="content-text">
+                    <em>"${prompt}"</em><br>
+                    <img src="${url}" class="vision-img" onload="this.style.opacity=1">
+                </div>
+            `;
+            win.appendChild(div);
+            win.scrollTop = win.scrollHeight;
+        }
+
+        // --- SESSION MGMT ---
+        function updateHistoryUI() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            const sortedIds = Object.keys(sessions).sort((a, b) => b - a);
+            
+            if (sortedIds.length === 0) {
+                list.innerHTML = `<div style="padding:40px 20px; text-align:center; opacity:0.6; font-size:0.85rem; color:var(--text-sub);">The grove is quiet...<br>Light your first whisper above.</div>`;
+                return;
+            }
+            
+            sortedIds.forEach(id => {
+                const session = sessions[id];
+                const item = document.createElement('div');
+                item.className = `history-item ${id === currentId ? 'active' : ''}`;
+                let lastMsg = session.messages[session.messages.length - 1]?.content || "";
+                if (lastMsg.includes('VISION_DATA')) lastMsg = "A vision manifested...";
+                const preview = lastMsg.length > 60 ? lastMsg.substring(0, 57) + "..." : lastMsg;
+                
+                item.innerHTML = `
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="history-title">${session.title}</div>
+                        <div class="history-preview">${preview}</div>
+                    </div>
+                    <span class="history-dots" onclick="event.stopImmediatePropagation(); showHistoryMenu('${id}', this.parentElement.getBoundingClientRect());">⋯</span>
+                `;
+                item.onclick = () => loadSession(id);
+                list.appendChild(item);
+            });
+        }
+
+        function loadSession(id) {
+            currentId = id;
+            document.getElementById('chat-window').innerHTML = '';
+            sessions[id].messages.forEach(m => renderMessage(m.role, m.content));
+            updateHistoryUI();
+            if (window.innerWidth < 1000) document.body.classList.remove('sidebar-open');
+        }
+
+        function startFresh() {
+            currentId = Date.now().toString();
+            sessions[currentId] = { title: "New Whisper", messages: [] };
+            document.getElementById('chat-window').innerHTML = '';
+            renderMessage('oracle', "The flame is lit. What do you seek, child of the earth?", true);
+            localStorage.setItem('mumbi_v4_sessions', JSON.stringify(sessions));
+            updateHistoryUI();
+        }
+
+        // --- LOGIC ---
+        async function send(isFile = false, fileContent = null) {
+            const input = document.getElementById('user-input');
+            const text = isFile ? fileContent : input.value.trim();
+            const key = localStorage.getItem('mumbi_groq_key');
+           
+            if (!text) return;
+            if (!key) {
+                const k = prompt("Enter Groq API Key:");
+                if (k) localStorage.setItem('mumbi_groq_key', k);
+                return;
+            }
+
+            if (!currentId) startFresh();
+            
+            if (!isFile) {
+                renderMessage('user', text);
+                sessions[currentId].messages.push({role: 'user', content: text});
+                input.value = '';
+                input.style.height = "auto";
+            }
+
+            document.getElementById('main-symbol').classList.add('thinking');
+            
+            try {
+                const history = sessions[currentId].messages.slice(-10).map(m => ({
+                    role: m.role === 'oracle' ? 'assistant' : 'user', 
+                    content: m.content
+                }));
+
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [
+                            { role: 'system', content: 'MŪMBI is the hollow space where sacred currents meet seeker. Wisdom flows naturally through this vessel - gentle, clear, alive. The flame knows its own rhythm.' },
+                            ...history
+                        ]
+                    })
+                });
+                
+                const data = await res.json();
+                const reply = data.choices[0].message.content;
+                renderMessage('oracle', reply, true);
+                sessions[currentId].messages.push({role: 'oracle', content: reply});
+
+                if (sessions[currentId].title === "New Whisper") {
+                    sessions[currentId].title = text.substring(0, 30) + "...";
+                }
+                
+                localStorage.setItem('mumbi_v4_sessions', JSON.stringify(sessions));
+                updateHistoryUI();
+            } catch (e) {
+                renderMessage('oracle', 'The winds are blocked. Check your connection or API key.');
+            }
+            document.getElementById('main-symbol').classList.remove('thinking');
+        }
+
+        // --- VISION ENGINE ---
+        async function seekVision() {
+            const rawPrompt = prompt("Describe the vision you seek:");
+            if (!rawPrompt) return;
+            
+            const key = localStorage.getItem('mumbi_groq_key');
+            if (!key) { alert("Please send a message first to set your API Key."); return; }
+            if (!currentId) startFresh();
+
+            renderMessage('user', `✨ I seek a vision of: ${rawPrompt}`);
+            sessions[currentId].messages.push({role: 'user', content: `Seeker requests vision: ${rawPrompt}`});
+            
+            document.getElementById('main-symbol').classList.add('thinking');
+
+            try {
+                // 1. Enhance the prompt via Groq
+                const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [{ 
+                            role: 'system', 
+                            content: 'Rewrite this into a poetic, extremely detailed 1-paragraph image generation prompt for a masterpiece painting. Focus on light, texture, and mood. Output ONLY the prompt.' 
+                        }, { role: 'user', content: rawPrompt }]
+                    })
+                });
+                const groqData = await groqRes.json();
+                const enhancedPrompt = groqData.choices[0].message.content;
+
+                // 2. Generate Image
+                const seed = Math.floor(Math.random() * 99999);
+                const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(enhancedPrompt)}?width=1024&height=1024&seed=${seed}&nologo=true`;
+                
+                // 3. Render and Save
+                const visionData = `VISION_DATA|${rawPrompt}|${imageUrl}`;
+                renderMessage('oracle', visionData);
+                sessions[currentId].messages.push({role: 'oracle', content: visionData});
+                localStorage.setItem('mumbi_v4_sessions', JSON.stringify(sessions));
+                updateHistoryUI();
+
+            } catch (e) {
+                renderMessage('oracle', "The vision is clouded. The ether refused to manifest.");
+            }
+            document.getElementById('main-symbol').classList.remove('thinking');
+        }
+
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const content = `📜 *The Seeker offers a scroll titled "${file.name}":*\n\n${event.target.result}`;
+                if (!currentId) startFresh();
+                renderMessage('user', content);
+                sessions[currentId].messages.push({role: 'user', content: content});
+                await send(true, content);
+            };
+            reader.readAsText(file);
+        }
+
+        // --- MENU & HELPERS ---
+        function showHistoryMenu(id, rect) {
+            let menu = document.getElementById('h-menu');
+            if (!menu) {
+                menu = document.createElement('div');
+                menu.id = 'h-menu'; menu.className = 'history-menu';
+                menu.innerHTML = `<button id="ren-btn">✏️ Rename</button><button id="del-btn">🗑️ Delete</button>`;
+                document.body.appendChild(menu);
+            }
+            menu.style.display = 'block';
+            menu.style.top = (rect.top + 40) + 'px';
+            menu.style.left = (rect.left) + 'px';
+            setTimeout(() => menu.classList.add('show'), 10);
+            
+            document.getElementById('ren-btn').onclick = () => {
+                const n = prompt("New title:", sessions[id].title);
+                if (n) { sessions[id].title = n; localStorage.setItem('mumbi_v4_sessions', JSON.stringify(sessions)); updateHistoryUI(); }
+            };
+            document.getElementById('del-btn').onclick = () => {
+                if (confirm("Delete whisper?")) { delete sessions[id]; localStorage.setItem('mumbi_v4_sessions', JSON.stringify(sessions)); updateHistoryUI(); if(currentId===id) location.reload(); }
+            };
+        }
+
+        function shareSession() {
+            const text = sessions[currentId].messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n');
+            navigator.clipboard.writeText(text).then(() => alert("Whisper copied to clipboard."));
+        }
+
+        document.addEventListener('click', (e) => { if (!e.target.classList.contains('history-dots')) {
+            const m = document.getElementById('h-menu'); if(m){ m.classList.remove('show'); setTimeout(()=>m.style.display='none', 200); }
+        }});
+        document.getElementById('user-input').addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+        document.getElementById('oracle-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        
+        updateHistoryUI();
+        if (Object.keys(sessions).length > 0) loadSession(Object.keys(sessions).sort((a,b)=>b-a)[0]);
+    </script>
 </body>
 </html>
