@@ -747,13 +747,13 @@
             }
         }
 
-      function startFresh() {
-    // 1. Check if the CURRENT session is already empty/new
-    // If it exists and has no messages (or only the welcome message), just stay here.
+function startFresh() {
+    // 1. THE GATEKEEPER: Check if the current session is already "New" and empty
     if (currentId && sessions[currentId]) {
-        const msgCount = sessions[currentId].messages.length;
-        if (msgCount === 0 || (msgCount === 1 && sessions[currentId].messages[0].role === 'oracle')) {
-            // Already on an empty whisper, just close sidebar and return
+        const messages = sessions[currentId].messages;
+        // If there are no messages, or only the initial Mūmbi welcome message
+        if (messages.length === 0 || (messages.length === 1 && messages[0].role === 'oracle')) {
+            // We are already on a fresh whisper! Just close the sidebar and stop.
             if (window.innerWidth <= 999) {
                 document.body.classList.remove('sidebar-open');
             }
