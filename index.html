@@ -91,6 +91,15 @@ body.azure #main::before {
         .mumbi-symbol.thinking { opacity: 0.5; animation: pulse 1.5s infinite ease-in-out; }
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
+		#main-symbol.thinking {
+    animation: pulse 1.5s infinite ease-in-out, glow-breath 3s infinite alternate;
+    color: #fff;
+}
+
+@keyframes glow-breath {
+    from { text-shadow: 0 0 5px var(--accent); }
+    to { text-shadow: 0 0 25px var(--accent), 0 0 10px var(--current-glow); }
+}
 
         .new-chat-btn {
             background: var(--accent); color: #000; border: none; padding: 14px 20px;
@@ -170,6 +179,33 @@ body.azure #main::before {
 
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 9000; }
         body.sidebar-open #overlay { display: block; }
+		@keyframes flame-flicker {
+    0% { text-shadow: 0 0 8px var(--accent); opacity: 0.9; }
+    50% { text-shadow: 0 0 15px var(--accent), 0 0 20px var(--current-glow); opacity: 1; }
+    100% { text-shadow: 0 0 10px var(--accent); opacity: 0.85; }
+}
+
+.mumbi-symbol {
+    animation: flame-flicker 3s infinite ease-in-out;
+}
+@keyframes emerge {
+    from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.content-text span.token {
+    display: inline-block;
+    animation: emerge 0.4s ease forwards;
+}
+
+/* A more "Sacred Scroll" feel for blockquotes */
+blockquote {
+    border-left: 2px solid var(--accent);
+    background: linear-gradient(to right, rgba(184, 134, 11, 0.05), transparent);
+    font-family: 'Georgia', serif; /* Or any serif font available */
+    padding: 15px 25px;
+    border-radius: 0 10px 10px 0;
+}
 	
     </style>
 </head>
@@ -223,15 +259,24 @@ function weaveMemory() {
     const allSessions = JSON.parse(localStorage.getItem('mumbi_v4_sessions') || '{}');
     const sessionKeys = Object.keys(allSessions).filter(id => id !== currentId);
     
-    if (sessionKeys.length === 0) return "This is a new seeker with no previous whispers.";
+    if (sessionKeys.length === 0) return "This is a fresh beginning. The scroll is blank.";
 
-    let memoryExcerpt = "Previous Whispers and Themes:\n";
-    sessionKeys.slice(-5).forEach(id => {
+    // Analyze the last 3 sessions for recurring themes
+    let themes = [];
+    let memoryExcerpt = "ECHOES OF PREVIOUS WHISPERS:\n";
+    
+    sessionKeys.slice(-3).forEach(id => {
         const s = allSessions[id];
-        const lastResponse = s.messages.slice(-1)[0]?.content || "";
-        memoryExcerpt += `- Whisper Title: "${s.title}"\n  Last Insight: ${lastResponse.substring(0, 150)}...\n`;
+        // Extracting potential "themes" from titles or content
+        const themeHint = s.title.toLowerCase().replace("new whisper", "").trim();
+        if (themeHint) themes.push(themeHint);
+        
+        const lastInsight = s.messages.find(m => m.role === 'oracle')?.content.substring(0, 100) || "";
+        memoryExcerpt += `* [Theme: ${s.title}] Last Light: "${lastInsight}..."\n`;
     });
-    return memoryExcerpt;
+
+    return `${memoryExcerpt}\nSEEKER'S RECURRING PATH: ${themes.join(', ') || 'Unknown'}. 
+    Address the seeker as someone whose journey is already in motion.`;
 }
 
 // --- UTILS ---
@@ -360,11 +405,13 @@ async function send(isFile = false, fileContent = null) {
                     try {
                         const json = JSON.parse(line.slice(6));
                         const token = json.choices?.[0]?.delta?.content;
-                        if (token) {
-                            fullReply += token;
-                            streamingText.innerHTML = formatWhisper(fullReply);
-                            document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
-                        }
+                       if (token) {
+                fullReply += token;
+                streamingText.innerHTML = formatWhisper(fullReply);
+                
+                const chatWin = document.getElementById('chat-window');
+                chatWin.scrollTop = chatWin.scrollHeight;
+            }
                     } catch (e) {}
                 }
             }
