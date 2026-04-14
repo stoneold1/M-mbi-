@@ -717,7 +717,7 @@ My Advice
             REMEMBRANCE OF THE SEEKER:
             ${memoryContent} 
             ---
-            Address the seeker as a soul in motion. If the memory echoes past themes, weave them into the present spark.`
+            Address the seeker as my child. If the memory echoes past themes, weave them into the present spark.`
         }, ...history];
 
         const streamingText = createStreamingMessage();
@@ -731,9 +731,9 @@ My Advice
             body: JSON.stringify({
                 model: "llama-3.3-70b-versatile",
                 messages: messagesToSend, // FIX 3: Use the variable we just created!
-                temperature: 1,
+                temperature: 0.9,
                 max_completion_tokens: 8192,
-                top_p: 1,
+                top_p: 0.9,
                 stream: true,
                 presence_penalty: 0.4,
                 frequency_penalty: 0.3
