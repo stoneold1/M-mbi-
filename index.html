@@ -46,36 +46,20 @@
     --orb2:         #1a6bbf;
   }
 
-  /* ── SACRED PARCHMENT ── */
-  body.frost {
-    --bg:           #f8f2e4;
-    --glass:        rgba(255, 248, 230, 0.65);
-    --glass-border: rgba(160, 90, 30, 0.28);
-    --text:         #2c1810;
-    --text-dim:     rgba(44, 24, 16, 0.45);
-    --accent:       #a0521e;
-    --accent-glow:  rgba(160, 82, 30, 0.22);
-    --ember:        #c8402e;
-    --bubble-user:  rgba(160, 82, 30, 0.1);
-    --send-bg:      linear-gradient(140deg, #a0521e 0%, #c8402e 100%);
-    --orb1:         #d4aa4e;
-    --orb2:         #c8402e;
-  }
-
-  /* ── VOID EMBER ── */
-  body.amoled {
-    --bg:           #0a0000;
-    --glass:        rgba(40, 8, 0, 0.55);
-    --glass-border: rgba(255, 107, 53, 0.28);
-    --text:         #ffe8d6;
-    --text-dim:     rgba(255, 232, 214, 0.42);
-    --accent:       #ff6b35;
-    --accent-glow:  rgba(255, 107, 53, 0.32);
-    --ember:        #ff3860;
-    --bubble-user:  rgba(255, 107, 53, 0.1);
-    --send-bg:      linear-gradient(140deg, #ff6b35 0%, #ff3860 100%);
-    --orb1:         #ff5520;
-    --orb2:         #ff3860;
+  /* ── CLAUDE CREAM ── */
+  body.claude {
+    --bg:           #f9f5ef;
+    --glass:        rgba(255, 252, 246, 0.72);
+    --glass-border: rgba(180, 150, 110, 0.22);
+    --text:         #1c1710;
+    --text-dim:     rgba(28, 23, 16, 0.42);
+    --accent:       #7c5c3a;
+    --accent-glow:  rgba(124, 92, 58, 0.2);
+    --ember:        #a0703a;
+    --bubble-user:  rgba(124, 92, 58, 0.08);
+    --send-bg:      linear-gradient(140deg, #7c5c3a 0%, #a0703a 100%);
+    --orb1:         #c9a87a;
+    --orb2:         #e8d8b8;
   }
 
   /* ── BASE ── */
@@ -324,11 +308,12 @@
     padding: 15px 22px;
     border-radius: 20px 20px 4px 20px;
     background: var(--bubble-user);
-    border: 1px solid var(--glass-border);
+    border: none;
     color: var(--text); max-width: 80%;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     font-size: 15.5px;
+    text-align: center;
   }
 
   .bubble.ai {
@@ -337,6 +322,8 @@
     color: var(--text); width: 100%; max-width: 100%;
     font-family: 'DM Sans', sans-serif;
     font-size: 16px; line-height: 1.85;
+    text-align: center;
+    border: none;
   }
 
   /* Markdown styling inside AI bubble */
@@ -637,7 +624,7 @@ NEVER: Run bullet content into prose. Never write a wall of text. Never explain 
 let chatHistory  = JSON.parse(localStorage.getItem('mumbi_v12')) || [{ id: Date.now().toString(), title: 'Initial Whisper', messages: [] }];
 let activeChatId = chatHistory[0].id;
 let themeIndex   = parseInt(localStorage.getItem('mumbi_theme')) || 0;
-const THEMES     = ['azure', 'frost', 'amoled', ''];
+const THEMES     = ['azure', 'claude', ''];
 let menuTargetId = null;
 
 const messagesEl  = document.getElementById('messages');
@@ -802,12 +789,27 @@ document.getElementById('new-chat-btn').onclick      = () => {
 document.getElementById('theme-btn').onclick = () => {
   themeIndex = (themeIndex + 1) % THEMES.length;
   document.body.className = THEMES[themeIndex];
+  localStorage.setItem('mumbi_theme_locked', '1');
   save();
 };
 window.onclick = () => contextMenu.style.display = 'none';
 
 // ── INIT ─────────────────────────────────────────────
-document.body.className = THEMES[themeIndex];
+// Apply system theme on first launch, respect saved preference after
+if (!localStorage.getItem('mumbi_theme')) {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.body.className = prefersDark ? 'azure' : 'frost';
+} else {
+  document.body.className = THEMES[themeIndex];
+}
+
+// Follow system theme changes live (only if user has not manually chosen)
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('mumbi_theme')) {
+    document.body.className = e.matches ? 'azure' : 'frost';
+  }
+});
+
 renderMessages();
 renderChatList();
 
